@@ -1,0 +1,799 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ============================================================
+         MediaForge „PowerUI“ — eine Quelle für Farben, Flächen, Controls.
+         Flächen sind nach Höhe gestaffelt: Fenster → Panel → Karte → Feld.
+         ============================================================ -->
+
+    <!-- Flächen -->
+    <SolidColorBrush x:Key="PowerBackground" Color="#131820"/>
+    <SolidColorBrush x:Key="PowerSidebar" Color="#181E27"/>
+    <SolidColorBrush x:Key="PowerCard" Color="#1B222D"/>
+    <SolidColorBrush x:Key="PowerRow" Color="#202833"/>
+    <SolidColorBrush x:Key="PowerInputBrush" Color="#222A36"/>
+    <SolidColorBrush x:Key="PowerTerminal" Color="#0E1218"/>
+    <SolidColorBrush x:Key="PowerBorder" Color="#303947"/>
+    <SolidColorBrush x:Key="PowerBorderSoft" Color="#27303C"/>
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="PowerText" Color="#EEF2F7"/>
+    <SolidColorBrush x:Key="PowerMuted" Color="#939CAA"/>
+
+    <!-- Funktionsfarben -->
+    <SolidColorBrush x:Key="PowerPrimary" Color="#4A7CF7"/>
+    <SolidColorBrush x:Key="PowerPrimaryHover" Color="#5C8BFF"/>
+    <SolidColorBrush x:Key="PowerSuccess" Color="#4CAF7D"/>
+    <SolidColorBrush x:Key="PowerWarning" Color="#E0B84A"/>
+    <SolidColorBrush x:Key="PowerDanger" Color="#E16363"/>
+
+    <!-- Modulfarben: jedes Werkzeug behält seinen Ton vom Hauptmenü bis in die Ansicht -->
+    <SolidColorBrush x:Key="ModuleDownload" Color="#5B8CFF"/>
+    <SolidColorBrush x:Key="ModuleCut" Color="#E2696C"/>
+    <SolidColorBrush x:Key="ModuleConvert" Color="#D9A441"/>
+    <SolidColorBrush x:Key="ModuleSpeed" Color="#45A9CE"/>
+    <SolidColorBrush x:Key="ModuleLink" Color="#3FB8A2"/>
+    <SolidColorBrush x:Key="ModuleEditor" Color="#A78BFA"/>
+    <SolidColorBrush x:Key="ModuleSorter" Color="#E08A4B"/>
+    <SolidColorBrush x:Key="ModuleGallery" Color="#DE8FBF"/>
+
+    <!-- Aliase für bestehende Bindungen -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#131820"/>
+    <SolidColorBrush x:Key="PanelBrush" Color="#181E27"/>
+    <SolidColorBrush x:Key="CardBrush" Color="#1B222D"/>
+    <SolidColorBrush x:Key="TimelineBrush" Color="#0E1218"/>
+    <SolidColorBrush x:Key="MutedBrush" Color="#939CAA"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="#5B8CFF"/>
+    <SolidColorBrush x:Key="GreenBrush" Color="#4CAF7D"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="#E0B84A"/>
+    <SolidColorBrush x:Key="RedBrush" Color="#E16363"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#E2696C"/>
+
+    <!-- ===================== Flächen & Text ===================== -->
+
+    <Style x:Key="PowerCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PowerCard}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PowerBorderSoft}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="11"/>
+    </Style>
+
+    <Style x:Key="CardBorder" TargetType="Border" BasedOn="{StaticResource PowerCardStyle}">
+        <Setter Property="Padding" Value="14"/>
+    </Style>
+
+    <Style x:Key="ViewHeader" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PowerSidebar}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PowerBorderSoft}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Padding" Value="16,11"/>
+    </Style>
+
+    <Style x:Key="SectionTitle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,9"/>
+    </Style>
+
+    <Style x:Key="FieldLabel" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+        <Setter Property="FontSize" Value="10.5"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="MetaText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- ===================== Buttons ===================== -->
+
+    <Style x:Key="PowerButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="Background" Value="{StaticResource PowerInputBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="13,7"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontSize" Value="12.5"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="ButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="#2B3543"/>
+                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#465266"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#80A4FF"/>
+                            <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value=".72"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value=".42"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerPrimaryButton" TargetType="Button" BasedOn="{StaticResource PowerButton}">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4A86FF" Offset="0"/>
+                    <GradientStop Color="#4568F6" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderBrush" Value="#638FFF"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="MinHeight" Value="40"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="ButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#426EFF" BlurRadius="12" ShadowDepth="0" Opacity=".42"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#C7D7FF"/>
+                            <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value=".75"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ButtonBorder" Property="Opacity" Value=".43"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerLinkButton" TargetType="Button" BasedOn="{StaticResource PowerButton}">
+        <Setter Property="Background" Value="#252E3B"/>
+        <Setter Property="BorderBrush" Value="#3D4A5D"/>
+        <Setter Property="Foreground" Value="#6F9AFF"/>
+    </Style>
+
+    <Style x:Key="PowerGhostButton" TargetType="Button" BasedOn="{StaticResource PowerButton}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PowerBorderSoft}"/>
+        <Setter Property="Padding" Value="9,5"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="FontSize" Value="11.5"/>
+    </Style>
+
+    <Style x:Key="PowerDangerButton" TargetType="Button" BasedOn="{StaticResource PowerButton}">
+        <Setter Property="Background" Value="#3A2530"/>
+        <Setter Property="BorderBrush" Value="#5E3742"/>
+        <Setter Property="Foreground" Value="{StaticResource PowerDanger}"/>
+    </Style>
+
+    <!-- Kompaktes Quadrat für Icon-Aktionen in Listen -->
+    <Style x:Key="PowerIconButton" TargetType="Button" BasedOn="{StaticResource PowerButton}">
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="PowerIconDangerButton" TargetType="Button" BasedOn="{StaticResource PowerIconButton}">
+        <Setter Property="Foreground" Value="{StaticResource PowerDanger}"/>
+    </Style>
+
+    <!-- Aliase -->
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource PowerPrimaryButton}"/>
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PowerDangerButton}"/>
+
+    <!-- ===================== Eingaben ===================== -->
+
+    <Style x:Key="PowerInput" TargetType="TextBox">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="Background" Value="{StaticResource PowerInputBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CaretBrush" Value="White"/>
+        <Setter Property="SelectionBrush" Value="#3C63C4"/>
+        <Setter Property="Padding" Value="11,7"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="InputBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7">
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                            <TextBlock x:Name="Watermark"
+                                       Margin="{TemplateBinding Padding}"
+                                       Foreground="#7E8795"
+                                       Text="{TemplateBinding Tag}"
+                                       TextTrimming="CharacterEllipsis"
+                                       IsHitTestVisible="False"
+                                       Visibility="Collapsed"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="Watermark" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource PowerPrimary}"/>
+                            <Setter TargetName="Watermark" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="InputBorder" Property="Opacity" Value=".45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerTimeInput" TargetType="TextBox" BasedOn="{StaticResource PowerInput}">
+        <Setter Property="Width" Value="38"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+        <Setter Property="MaxLength" Value="2"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+    </Style>
+
+    <Style x:Key="PowerCodeInput" TargetType="TextBox" BasedOn="{StaticResource PowerInput}">
+        <Setter Property="FontFamily" Value="Consolas"/>
+    </Style>
+
+    <!-- Nur-Lese-Protokoll im Terminal-Look -->
+    <Style x:Key="PowerTerminalBox" TargetType="TextBox" BasedOn="{StaticResource PowerInput}">
+        <Setter Property="Background" Value="{StaticResource PowerTerminal}"/>
+        <Setter Property="BorderBrush" Value="#333D49"/>
+        <Setter Property="Foreground" Value="#C5CCD6"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="FontSize" Value="10.5"/>
+        <Setter Property="Padding" Value="13,10"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+    </Style>
+
+    <Style x:Key="PowerComboItem" TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+        <Setter Property="Padding" Value="10,7"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#304262"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#37599B"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerCombo" TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="Background" Value="{StaticResource PowerInputBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,5"/>
+        <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource PowerComboItem}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Border x:Name="ComboBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="7"/>
+                        <ToggleButton Background="Transparent"
+                                      BorderThickness="0"
+                                      Focusable="False"
+                                      ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton"><Border Background="Transparent"/></ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <ContentPresenter x:Name="SelectionContent"
+                                          Margin="10,0,31,0"
+                                          IsHitTestVisible="False"
+                                          VerticalAlignment="Center"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                        <TextBox x:Name="PART_EditableTextBox"
+                                 Margin="7,1,31,1"
+                                 Visibility="Collapsed"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="{StaticResource PowerText}"
+                                 CaretBrush="White"
+                                 FontSize="12"
+                                 VerticalContentAlignment="Center"
+                                 Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Path Data="M 0 0 L 5 5 L 10 0 Z"
+                              Fill="{StaticResource PowerMuted}"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              Margin="0,0,11,0"
+                              IsHitTestVisible="False"/>
+                        <Popup x:Name="PART_Popup"
+                               Placement="Bottom"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               AllowsTransparency="True"
+                               Focusable="False"
+                               PopupAnimation="Fade">
+                            <Border Background="{StaticResource PowerRow}"
+                                    BorderBrush="#3B4657"
+                                    BorderThickness="1"
+                                    CornerRadius="7"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                    MaxHeight="320"
+                                    Padding="3">
+                                <ScrollViewer CanContentScroll="True"><ItemsPresenter/></ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEditable" Value="True">
+                            <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="SelectionContent" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{StaticResource PowerPrimary}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ComboBorder" Property="Opacity" Value=".42"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerToggle" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Grid Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="Track"
+                                Width="36"
+                                Height="20"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="#343D4A"
+                                BorderBrush="#485262"
+                                BorderThickness="1"
+                                CornerRadius="10">
+                            <Ellipse x:Name="Knob"
+                                     Width="14"
+                                     Height="14"
+                                     Margin="2"
+                                     HorizontalAlignment="Left"
+                                     Fill="#E9EDF3"/>
+                        </Border>
+                        <ContentPresenter Grid.Column="1"
+                                          Margin="7,0,0,0"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="{StaticResource PowerPrimary}"/>
+                            <Setter TargetName="Track" Property="BorderBrush" Value="#6E98FF"/>
+                            <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right"/>
+                            <Setter TargetName="Knob" Property="Fill" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Track" Property="BorderBrush" Value="#DCE6FF"/>
+                            <Setter TargetName="Track" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value=".42"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerRadio" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="MinHeight" Value="28"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                        <Grid Width="18" Height="18" VerticalAlignment="Center">
+                            <Ellipse x:Name="RadioBorder" Stroke="#8993A2" StrokeThickness="1.6"/>
+                            <Ellipse x:Name="RadioDot" Width="8" Height="8" Fill="{StaticResource PowerPrimary}" Visibility="Collapsed"/>
+                        </Grid>
+                        <ContentPresenter Margin="9,0,0,0" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="RadioBorder" Property="Stroke" Value="#6E9BFF"/>
+                            <Setter TargetName="RadioBorder" Property="StrokeThickness" Value="2"/>
+                            <Setter TargetName="RadioDot" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="RadioBorder" Property="Stroke" Value="White"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value=".42"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================== Fortschritt & Listen ===================== -->
+
+    <Style x:Key="PowerProgress" TargetType="ProgressBar">
+        <Setter Property="Height" Value="8"/>
+        <Setter Property="Foreground" Value="{StaticResource PowerPrimary}"/>
+        <Setter Property="Background" Value="#27303C"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4"/>
+                        <Border x:Name="PART_Track"/>
+                        <Border x:Name="PART_Indicator"
+                                Background="{TemplateBinding Foreground}"
+                                CornerRadius="4"
+                                HorizontalAlignment="Left"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Schieberegler: gefüllte Spur links vom Griff, damit Position und Lautstärke gleich aussehen -->
+    <Style x:Key="PowerSliderTrackButton" TargetType="RepeatButton">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border Height="5" CornerRadius="3" Background="{TemplateBinding Background}" VerticalAlignment="Center"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerSliderThumb" TargetType="Thumb">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Width" Value="13"/>
+        <Setter Property="Height" Value="13"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Grid Background="Transparent">
+                        <Ellipse x:Name="Dot" Fill="{StaticResource PowerText}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Dot" Property="Fill" Value="#FFFFFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerSlider" TargetType="Slider">
+        <Setter Property="Foreground" Value="{StaticResource PowerPrimary}"/>
+        <Setter Property="Background" Value="#2A3341"/>
+        <Setter Property="MinHeight" Value="20"/>
+        <Setter Property="IsMoveToPointEnabled" Value="True"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid Background="Transparent" VerticalAlignment="Center">
+                        <Track x:Name="PART_Track">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource PowerSliderTrackButton}"
+                                              Background="{TemplateBinding Foreground}"
+                                              Command="Slider.DecreaseLarge"/>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource PowerSliderTrackButton}"
+                                              Background="{TemplateBinding Background}"
+                                              Command="Slider.IncreaseLarge"/>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource PowerSliderThumb}"/>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value=".4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PowerListBox" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+    </Style>
+
+    <Style x:Key="PowerListItem" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0,0,0,7"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <ContentPresenter/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Zeile innerhalb einer Liste -->
+    <Style x:Key="PowerRowStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+        <Setter Property="BorderBrush" Value="#2F3947"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="10"/>
+    </Style>
+
+    <!-- ===================== Bildlaufleisten ===================== -->
+
+    <Style x:Key="PowerScrollThumb" TargetType="Thumb">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Border x:Name="ThumbBorder" Background="#3A4554" CornerRadius="4" Margin="3"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ThumbBorder" Property="Background" Value="#4C5A6D"/>
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="ThumbBorder" Property="Background" Value="#5C6C82"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Width" Value="11"/>
+        <Setter Property="MinWidth" Value="11"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Border Background="{TemplateBinding Background}">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource PowerScrollThumb}"/>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter Property="Height" Value="11"/>
+                            <Setter Property="MinHeight" Value="11"/>
+                            <Setter Property="Width" Value="Auto"/>
+                            <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===================== Implizite Basisstile ===================== -->
+
+    <Style TargetType="Window">
+        <Setter Property="Background" Value="{StaticResource PowerBackground}"/>
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+    </Style>
+    <Style TargetType="UserControl">
+        <Setter Property="Background" Value="{StaticResource PowerBackground}"/>
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+    </Style>
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style TargetType="Label">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style TargetType="Button" BasedOn="{StaticResource PowerButton}"/>
+    <Style TargetType="TextBox" BasedOn="{StaticResource PowerInput}"/>
+    <Style TargetType="ComboBox" BasedOn="{StaticResource PowerCombo}"/>
+    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource PowerComboItem}"/>
+    <Style TargetType="CheckBox" BasedOn="{StaticResource PowerToggle}"/>
+    <Style TargetType="RadioButton" BasedOn="{StaticResource PowerRadio}"/>
+    <Style TargetType="ProgressBar" BasedOn="{StaticResource PowerProgress}"/>
+    <Style TargetType="Slider" BasedOn="{StaticResource PowerSlider}"/>
+    <Style TargetType="ListBox" BasedOn="{StaticResource PowerListBox}"/>
+    <Style TargetType="ListBoxItem" BasedOn="{StaticResource PowerListItem}"/>
+    <!-- ===================== Kontextmenues ===================== -->
+
+    <Style TargetType="ContextMenu">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{StaticResource PowerCard}"
+                            BorderBrush="{StaticResource PowerBorder}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="4">
+                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="Row" Background="Transparent" CornerRadius="5" Padding="10,6" MinWidth="170">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="Glyph"
+                                       Text="{TemplateBinding Tag}"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="11"
+                                       Width="20"
+                                       Foreground="{StaticResource PowerMuted}"
+                                       VerticalAlignment="Center"/>
+                            <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Row" Property="Background" Value="#232C38"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Row" Property="Opacity" Value=".45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Separator">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="8,4"/>
+        <Setter Property="Background" Value="{StaticResource PowerBorderSoft}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="1" Background="{TemplateBinding Background}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+        <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="9,6"/>
+        <Setter Property="FontSize" Value="11.5"/>
+    </Style>
+</ResourceDictionary>

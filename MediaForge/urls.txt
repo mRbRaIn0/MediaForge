@@ -1,0 +1,2 @@
+# Nur URLs, Kommentare mit # Zeit Stempel möglich mit 00:00:00-00:02:22 # mp3 für Musik #
+# Command: powershell -ExecutionPolicy Bypass -File .\DownloadQueue.ps1 #

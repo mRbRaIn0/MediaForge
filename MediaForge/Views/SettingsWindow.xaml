@@ -1,0 +1,261 @@
+<Window x:Class="MediaForge.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Einstellungen — MediaForge"
+        Width="812" Height="900" MinWidth="640" MinHeight="540"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        Background="{StaticResource BackgroundBrush}">
+    <Window.Resources>
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource BlueBrush}"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+        <Style x:Key="HintLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,3,0,0"/>
+        </Style>
+        <Style x:Key="BrowseButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="Background" Value="{StaticResource PowerInputBrush}"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="ToolTip" Value="Durchsuchen"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24,20,24,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,18">
+            <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="19" Margin="0,0,10,0"/>
+            <TextBlock Text="Einstellungen" FontSize="19" FontWeight="Bold"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="0,0,8,0">
+                <TextBlock Text="Pfade" Style="{StaticResource SectionHeader}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="168"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Standard-Zielordner:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Column="1" Text="{Binding DefaultOutputDirectory, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Standard-Zielordner"/>
+                    <Button Grid.Column="2" Command="{Binding BrowseCommand}" CommandParameter="default" Content="&#xED25;" Style="{StaticResource BrowseButton}" AutomationProperties.Name="Standard-Zielordner auswählen"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource HintLabel}"
+                               Text="Wird verwendet, solange im yt-dlp Bereich kein eigener Zielordner aktiv ist."
+                               Margin="0,3,0,12"/>
+
+                    <TextBlock Grid.Row="2" Text="Eigener Zielordner:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CustomOutputDirectory, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Eigener Zielordner"/>
+                    <Button Grid.Row="2" Grid.Column="2" Command="{Binding BrowseCommand}" CommandParameter="custom" Content="&#xED25;" Style="{StaticResource BrowseButton}" AutomationProperties.Name="Eigenen Zielordner auswählen"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource HintLabel}"
+                               Text="Aktiv, wenn im yt-dlp Bereich „Eigenen Zielordner nutzen“ eingeschaltet ist. Leer = Standard-Zielordner."
+                               Margin="0,3,0,12"/>
+
+                    <TextBlock Grid.Row="4" Text="yt-dlp Pfad:" Style="{StaticResource FieldLabel}" Margin="0,0,12,10"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding YtDlpPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10" AutomationProperties.Name="yt-dlp Pfad"/>
+                    <Button Grid.Row="4" Grid.Column="2" Command="{Binding BrowseCommand}" CommandParameter="ytdlp" Content="&#xED25;" Style="{StaticResource BrowseButton}" Margin="8,0,0,10" AutomationProperties.Name="yt-dlp.exe auswählen"/>
+
+                    <TextBlock Grid.Row="5" Text="ffmpeg Pfad:" Style="{StaticResource FieldLabel}" Margin="0,0,12,10"/>
+                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding FfmpegPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10" AutomationProperties.Name="ffmpeg Pfad"/>
+                    <Button Grid.Row="5" Grid.Column="2" Command="{Binding BrowseCommand}" CommandParameter="ffmpeg" Content="&#xED25;" Style="{StaticResource BrowseButton}" Margin="8,0,0,10" AutomationProperties.Name="ffmpeg.exe auswählen"/>
+
+                    <TextBlock Grid.Row="6" Text="URLs-Datei:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding UrlsFile, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="URLs-Datei"/>
+                    <Button Grid.Row="6" Grid.Column="2" Command="{Binding BrowseCommand}" CommandParameter="urls" Content="&#xED25;" Style="{StaticResource BrowseButton}" AutomationProperties.Name="URLs-Datei auswählen"/>
+                </Grid>
+
+                <TextBlock Style="{StaticResource HintLabel}" Margin="0,6,0,0"
+                           Text="ffprobe.exe und ffplay.exe werden im selben Ordner wie ffmpeg.exe erwartet. Relative Namen (z. B. „ffmpeg.exe“) lösen die automatische Suche aus."/>
+
+                <TextBlock Text="Cookies / Authentifizierung" Style="{StaticResource SectionHeader}" Margin="0,22,0,10"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="168"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Modus:" Style="{StaticResource FieldLabel}" Margin="0,0,12,10"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding CookieModes}" SelectedItem="{Binding CookieMode}" Margin="0,0,0,10" AutomationProperties.Name="Cookie-Modus"/>
+
+                    <TextBlock Grid.Row="1" Text="Browser:" Style="{StaticResource FieldLabel}" Margin="0,0,12,10"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Browsers}" Text="{Binding CookieBrowser, UpdateSourceTrigger=PropertyChanged}"
+                              IsEditable="True" IsEnabled="{Binding IsBrowserMode}" Margin="0,0,0,10" AutomationProperties.Name="Browser für Cookies"/>
+
+                    <TextBlock Grid.Row="2" Text="Browser-Profil (optional):" Style="{StaticResource FieldLabel}" Margin="0,0,12,10"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CookieProfile, UpdateSourceTrigger=PropertyChanged}"
+                             IsEnabled="{Binding IsBrowserMode}" Margin="0,0,0,10" AutomationProperties.Name="Browser-Profil"/>
+
+                    <TextBlock Grid.Row="3" Text="Cookie-Datei:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding CookieFile, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Cookie-Datei"/>
+                    <Button Grid.Row="3" Grid.Column="2" Command="{Binding BrowseCommand}" CommandParameter="cookies" Content="&#xED25;" Style="{StaticResource BrowseButton}" AutomationProperties.Name="Cookie-Datei auswählen"/>
+                </Grid>
+
+                <TextBlock Style="{StaticResource HintLabel}" Margin="0,6,0,0"
+                           Text="Der Modus bestimmt die Vorauswahl im yt-dlp Bereich; dort lässt sich pro Download weiterhin umschalten."/>
+
+                <TextBlock Text="File Sorter" Style="{StaticResource SectionHeader}" Margin="0,22,0,10"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="168"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Startordner:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Grid.Column="1" Text="{Binding SorterSourceDirectory, UpdateSourceTrigger=PropertyChanged}"
+                             AutomationProperties.Name="Startordner des Sorters"/>
+                    <Button Grid.Column="2" Command="{Binding BrowseCommand}" CommandParameter="sortersource"
+                            Content="&#xED25;" Style="{StaticResource BrowseButton}"
+                            AutomationProperties.Name="Startordner auswählen"/>
+                </Grid>
+                <TextBlock Style="{StaticResource HintLabel}" Margin="0,3,0,12"
+                           Text="Aus diesem Ordner liest der Sorter Videos, Fotos und übrige Dateien ein. Im Sorter selbst lässt er sich jederzeit umstellen."/>
+
+                <WrapPanel>
+                    <CheckBox Content="Unterordner einbeziehen" IsChecked="{Binding SorterIncludeSubfolders}" Margin="0,0,20,10"
+                              ToolTip="Liest auch Dateien aus Unterordnern des Startordners"/>
+                    <CheckBox Content="Unterordner im Ziel behalten" IsChecked="{Binding SorterPreserveSubfolders}" Margin="0,0,20,10"
+                              ToolTip="Legt die Datei im Zielbereich unter demselben Unterordner ab"/>
+                    <CheckBox Content="Kopieren statt verschieben" IsChecked="{Binding SorterCopyMode}" Margin="0,0,20,10"
+                              ToolTip="Lässt die Datei im Startordner liegen"/>
+                    <CheckBox Content="Videos automatisch abspielen" IsChecked="{Binding SorterAutoPlay}" Margin="0,0,0,10"/>
+                </WrapPanel>
+
+                <Grid Margin="0,4,0,8">
+                    <TextBlock Text="Zielbereiche" Foreground="White" FontSize="12.5" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding SorterTargets.Count, StringFormat={}{0} Bereiche}"
+                               Foreground="{StaticResource MutedBrush}" FontSize="11" HorizontalAlignment="Right"/>
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding SorterTargets}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource PowerRowStyle}" Padding="9,8" Margin="0,0,0,6">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="34"/>
+                                        <ColumnDefinition Width="164"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Background="#2B3543" BorderBrush="#404C5E" BorderThickness="1" CornerRadius="5"
+                                            Width="28" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                            ToolTip="Diese Taste sortiert in den Bereich">
+                                        <TextBlock Text="{Binding EffectiveKey}" FontFamily="Consolas" FontSize="12" FontWeight="Bold"
+                                                   Foreground="{StaticResource ModuleSorter}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBox Grid.Column="1" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="8,0,0,0" ToolTip="Anzeigename" AutomationProperties.Name="Name des Zielbereichs"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Folder, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="8,0,0,0" ToolTip="{Binding Folder}" AutomationProperties.Name="Ordner des Zielbereichs"/>
+                                    <Button Grid.Column="3"
+                                            Command="{Binding DataContext.BrowseTargetCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" Content="&#xED25;" Style="{StaticResource BrowseButton}"
+                                            AutomationProperties.Name="Ordner auswählen"/>
+                                    <TextBox Grid.Column="4" Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="62" MaxLength="1" Margin="8,0,0,0" TextAlignment="Center" Padding="4,7"
+                                             ToolTip="Eigene Taste, leer lassen für automatische Vergabe"
+                                             AutomationProperties.Name="Eigene Taste"/>
+                                    <Button Grid.Column="5"
+                                            Command="{Binding DataContext.MoveTargetUpCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" Content="&#xE70E;" Style="{StaticResource PowerIconButton}"
+                                            Margin="8,0,0,0" ToolTip="Nach oben" AutomationProperties.Name="Bereich nach oben"/>
+                                    <Button Grid.Column="6"
+                                            Command="{Binding DataContext.MoveTargetDownCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" Content="&#xE70D;" Style="{StaticResource PowerIconButton}"
+                                            Margin="5,0,0,0" ToolTip="Nach unten" AutomationProperties.Name="Bereich nach unten"/>
+                                    <Button Grid.Column="7"
+                                            Command="{Binding DataContext.RemoveTargetCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" Content="&#xE711;" Style="{StaticResource PowerIconDangerButton}"
+                                            Margin="5,0,0,0" ToolTip="Bereich entfernen" AutomationProperties.Name="Bereich entfernen"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Button Command="{Binding AddTargetCommand}" HorizontalAlignment="Left" MinWidth="220" Margin="0,4,0,0"
+                        AutomationProperties.Name="Zielbereich hinzufügen">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                        <TextBlock Text="Zielbereich hinzufügen"/>
+                    </StackPanel>
+                </Button>
+
+                <TextBlock Style="{StaticResource HintLabel}" Margin="0,8,0,0"
+                           Text="Die Tasten werden der Reihe nach vergeben: erst 1-9 und 0, danach Q W E R T Z U I O P. Eine eigene Taste überschreibt die automatische und hat im Sorter Vorrang vor S (überspringen) und L (neu laden)."/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2" Margin="0,18,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding ResetCommand}" Style="{StaticResource PowerDangerButton}" MinWidth="150" AutomationProperties.Name="Einstellungen zurücksetzen">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE777;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                    <TextBlock Text="Zurücksetzen"/>
+                </StackPanel>
+            </Button>
+            <TextBlock Grid.Column="1" Text="{Binding SettingsFilePath}" Style="{StaticResource HintLabel}"
+                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center" Margin="14,0"
+                       ToolTip="{Binding SettingsFilePath}"/>
+            <Button Grid.Column="2" Click="Cancel_Click" IsCancel="True" MinWidth="130" AutomationProperties.Name="Abbrechen">
+                <TextBlock Text="Abbrechen"/>
+            </Button>
+            <Button Grid.Column="3" Click="Save_Click" IsDefault="True" Style="{StaticResource PrimaryButton}" MinWidth="150" Margin="10,0,0,0" AutomationProperties.Name="Einstellungen speichern">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                    <TextBlock Text="Speichern"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

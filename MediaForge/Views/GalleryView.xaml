@@ -1,0 +1,1593 @@
+﻿<UserControl x:Class="MediaForge.Views.GalleryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:MediaForge.Models"
+             Focusable="True"
+             Loaded="OnLoaded"
+             Unloaded="OnUnloaded"
+             PreviewKeyDown="OnPreviewKeyDown"
+             Background="{StaticResource PowerBackground}">
+    <UserControl.Resources>
+
+        <!-- Eintrag der Seitenleiste: Symbol, Name, Anzahl -->
+        <Style x:Key="NavButton" TargetType="Button" BasedOn="{StaticResource PowerButton}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="MinHeight" Value="34"/>
+            <Setter Property="FontSize" Value="12.5"/>
+        </Style>
+
+        <!-- Hervorhebung des offenen Eintrags; NavKey bildet Bereich und Artfilter zusammen ab -->
+        <Style x:Key="NavButtonAll" TargetType="Button" BasedOn="{StaticResource NavButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding NavKey}" Value="all">
+                    <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="NavButtonPhotos" TargetType="Button" BasedOn="{StaticResource NavButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding NavKey}" Value="photos">
+                    <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="NavButtonVideos" TargetType="Button" BasedOn="{StaticResource NavButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding NavKey}" Value="videos">
+                    <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="NavButtonFavorites" TargetType="Button" BasedOn="{StaticResource NavButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding NavKey}" Value="favorites">
+                    <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="NavButtonNotes" TargetType="Button" BasedOn="{StaticResource NavButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding NavKey}" Value="notes">
+                    <Setter Property="Background" Value="{StaticResource PowerRow}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource PowerBorder}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="NavGlyph" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+        </Style>
+
+        <!-- Unterordner: eingerückt und ruhiger als der Wurzelordner darüber -->
+        <Style x:Key="SubfolderButton" TargetType="Button" BasedOn="{StaticResource NavButton}">
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+        </Style>
+
+        <Style x:Key="RenameBox" TargetType="TextBox" BasedOn="{StaticResource PowerInput}">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRenaming}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="NavSection" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+            <Setter Property="FontSize" Value="9.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="10,16,0,5"/>
+        </Style>
+
+        <Style x:Key="CountText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Klapper vor einem Ordner; ohne Unterordner bleibt der Platz frei, damit alles fluchtet -->
+        <Style x:Key="TreeChevron" TargetType="ToggleButton">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="Transparent">
+                            <TextBlock x:Name="Glyph"
+                                       Text="&#xE76C;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="9"
+                                       Foreground="{StaticResource PowerMuted}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Glyph" Property="Text" Value="&#xE70D;"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Glyph" Property="Foreground" Value="{StaticResource PowerText}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasChildren}" Value="False">
+                    <Setter Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding HasSubfolders}" Value="False">
+                    <Setter Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Ein Ordner der Seitenleiste. Die Vorlage ruft sich über die Kinder selbst wieder auf. -->
+        <DataTemplate DataType="{x:Type models:GalleryFolder}">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ToggleButton IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                  Style="{StaticResource TreeChevron}"
+                                  ToolTip="Unterordner ein- und ausklappen"
+                                  AutomationProperties.Name="Unterordner ein- und ausklappen"/>
+                    <Button Grid.Column="1"
+                            Style="{StaticResource SubfolderButton}"
+                            Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            ToolTip="{Binding FullPath}"
+                            AutomationProperties.Name="{Binding Name}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE8B7;" Style="{StaticResource NavGlyph}" FontSize="11" Width="20"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Label}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Count}" Style="{StaticResource CountText}" Margin="8,0,0,0"/>
+                        </Grid>
+                    </Button>
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Children}"
+                              Margin="13,0,0,0"
+                              Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibility}}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Kachel eines Eintrags: nur das Bild, alles andere legt sich darüber -->
+        <Style x:Key="GalleryTile" TargetType="Button">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Frame"
+                                Background="{StaticResource PowerRow}"
+                                BorderBrush="{StaticResource PowerBorderSoft}"
+                                BorderThickness="1"
+                                CornerRadius="9"
+                                ClipToBounds="True">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource ModuleGallery}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Frame" Property="BorderBrush" Value="#80A4FF"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource PowerPrimary}"/>
+                                <Setter TargetName="Frame" Property="BorderThickness" Value="2"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Kleine runde Schaltfläche, die auf der Kachel liegt -->
+        <Style x:Key="TileBadgeButton" TargetType="Button">
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Dot" Background="#99000000" CornerRadius="13">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Dot" Property="Background" Value="#CC000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TileGlyphText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource PowerButton}">
+            <Setter Property="Background" Value="#252E3B"/>
+            <Setter Property="BorderBrush" Value="#37424F"/>
+            <Setter Property="Padding" Value="9,3"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="MinHeight" Value="0"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+
+        <!-- Album als Marke: mehrere lassen sich zugleich anhaken, keines ist vorausgewaehlt -->
+        <Style x:Key="AlbumChip" TargetType="ToggleButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Margin" Value="0,2,6,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Chip"
+                                Background="{StaticResource PowerRow}"
+                                BorderBrush="{StaticResource PowerBorder}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="9,4">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="Mark"
+                                           Text="&#xECCA;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="11"
+                                           Foreground="{StaticResource PowerMuted}"
+                                           Margin="0,0,7,0"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Chip" Property="Background" Value="#25355A"/>
+                                <Setter TargetName="Chip" Property="BorderBrush" Value="{StaticResource PowerPrimary}"/>
+                                <Setter TargetName="Mark" Property="Text" Value="&#xECCB;"/>
+                                <Setter TargetName="Mark" Property="Foreground" Value="{StaticResource PowerPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chip" Property="BorderBrush" Value="{StaticResource ModuleGallery}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Häkchenzeile im aufklappbaren Albummenü — bewusst ein Kästchen, kein Schiebeschalter -->
+        <Style x:Key="MenuCheck" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="Row" Background="Transparent" CornerRadius="5" Padding="9,6">
+                            <StackPanel Orientation="Horizontal">
+                                <Border x:Name="Box"
+                                        Width="16"
+                                        Height="16"
+                                        CornerRadius="4"
+                                        Background="{StaticResource PowerInputBrush}"
+                                        BorderBrush="{StaticResource PowerBorder}"
+                                        BorderThickness="1"
+                                        VerticalAlignment="Center">
+                                    <TextBlock x:Name="Mark"
+                                               Text="&#xE73E;"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="9"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Visibility="Collapsed"/>
+                                </Border>
+                                <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Box" Property="Background" Value="{StaticResource PowerPrimary}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource PowerPrimary}"/>
+                                <Setter TargetName="Mark" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Row" Property="Background" Value="#232C38"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Der Knopf, der das Albummenü auf- und zuklappt; zugeklappt steht dort die Anzahl -->
+        <Style x:Key="MenuButton" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="{StaticResource PowerText}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Face"
+                                Background="{StaticResource PowerInputBrush}"
+                                BorderBrush="{StaticResource PowerBorder}"
+                                BorderThickness="1"
+                                CornerRadius="7"
+                                Padding="10,7">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{TemplateBinding Tag}" FontFamily="Segoe MDL2 Assets" FontSize="12" Margin="0,0,9,0"/>
+                                <ContentPresenter Grid.Column="1" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="Chevron"
+                                           Grid.Column="2"
+                                           Text="&#xE70D;"
+                                           FontFamily="Segoe MDL2 Assets"
+                                           FontSize="9"
+                                           Foreground="{StaticResource PowerMuted}"
+                                           Margin="9,0,0,0"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Face" Property="BorderBrush" Value="{StaticResource ModuleGallery}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Face" Property="BorderBrush" Value="{StaticResource PowerPrimary}"/>
+                                <Setter TargetName="Chevron" Property="Text" Value="&#xE70E;"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ViewerMeta" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,7"/>
+        </Style>
+
+        <!-- Tagesgruppe der Zeitleiste -->
+        <DataTemplate x:Key="DayTemplate">
+            <StackPanel Margin="0,0,0,20">
+                <StackPanel Orientation="Horizontal" Margin="4,0,0,9">
+                    <TextBlock Text="{Binding Header}" FontSize="13.5" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding CountText}" Style="{StaticResource CountText}" Margin="10,1,0,0"/>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="170" Height="170" Margin="4">
+                                <Button Style="{StaticResource GalleryTile}"
+                                        Command="{Binding DataContext.OpenViewerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="{Binding Name}"
+                                        AutomationProperties.Name="{Binding Name}">
+                                    <Grid>
+                                        <TextBlock Text="&#xEB9F;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="26"
+                                                   Foreground="#3B4655"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"/>
+                                    </Grid>
+                                </Button>
+
+                                <!-- Auswahl -->
+                                <Button HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Margin="6"
+                                        Command="{Binding DataContext.ToggleSelectionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Auswählen"
+                                        AutomationProperties.Name="Eintrag auswählen">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource TileBadgeButton}">
+                                            <Setter Property="Opacity" Value="0"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Grid}}" Value="True">
+                                                    <Setter Property="Opacity" Value="1"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="Opacity" Value="1"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource TileGlyphText}">
+                                                <Setter Property="Text" Value="&#xECCA;"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="Text" Value="&#xECCB;"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource PowerPrimary}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Button>
+
+                                <!-- Favorit -->
+                                <Button HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="6"
+                                        Command="{Binding DataContext.ToggleFavoriteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Favorit"
+                                        AutomationProperties.Name="Als Favorit markieren">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource TileBadgeButton}">
+                                            <Setter Property="Opacity" Value="0"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Grid}}" Value="True">
+                                                    <Setter Property="Opacity" Value="1"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                    <Setter Property="Opacity" Value="1"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource TileGlyphText}">
+                                                <Setter Property="Text" Value="&#xEB51;"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                        <Setter Property="Text" Value="&#xEB52;"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource ModuleCut}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Button>
+
+                                <!-- Videodauer -->
+                                <Border HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Margin="6"
+                                        Background="#A6000000"
+                                        CornerRadius="4"
+                                        Padding="6,2"
+                                        IsHitTestVisible="False"
+                                        Visibility="{Binding IsVideo, Converter={StaticResource BoolToVisibility}}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" FontSize="9" Foreground="White" Margin="0,0,5,0"/>
+                                        <TextBlock Text="{Binding DurationText}" FontSize="10.5" Foreground="White" FontFamily="Consolas"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Tags -->
+                                <Border HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        Margin="6"
+                                        MaxWidth="112"
+                                        Background="#A6000000"
+                                        CornerRadius="4"
+                                        Padding="6,2"
+                                        IsHitTestVisible="False"
+                                        Visibility="{Binding HasTags, Converter={StaticResource BoolToVisibility}}">
+                                    <TextBlock Text="{Binding TagsText}"
+                                               FontSize="10"
+                                               Foreground="#D8DEE7"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Eine Zeile im Hinweisbereich: Datei, Grund, Ort — und die zwei Wege dorthin -->
+        <DataTemplate x:Key="IssueRow" DataType="{x:Type models:GalleryIssue}">
+            <Border Background="{StaticResource PowerRow}"
+                    BorderBrush="{StaticResource PowerBorderSoft}"
+                    BorderThickness="1"
+                    CornerRadius="7"
+                    Padding="10,7"
+                    Margin="0,0,0,5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="{Binding Name}"
+                                   FontSize="12"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding FullPath}"/>
+                        <TextBlock Text="{Binding Reason}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,3,0,0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsFault}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource PowerWarning}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsOriginal}" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource PowerSuccess}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Text="{Binding Location}"
+                                   Style="{StaticResource MetaText}"
+                                   TextTrimming="CharacterEllipsis"
+                                   Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding SizeText}"
+                               Style="{StaticResource MetaText}"
+                               Margin="0,0,12,0"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{StaticResource PowerIconButton}"
+                                Content="&#xEC50;"
+                                Command="{Binding DataContext.RevealCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding Item}"
+                                ToolTip="Im Explorer zeigen"
+                                AutomationProperties.Name="Im Explorer zeigen"/>
+                        <Button Style="{StaticResource PowerIconButton}"
+                                Content="&#xE8E5;"
+                                Margin="6,0,0,0"
+                                Command="{Binding DataContext.OpenExternalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding Item}"
+                                ToolTip="Mit Standardprogramm öffnen"
+                                AutomationProperties.Name="Mit Standardprogramm öffnen"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="238"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ===================== Seitenleiste ===================== -->
+        <Border Background="{StaticResource PowerSidebar}" BorderBrush="{StaticResource PowerBorderSoft}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Padding="12,12,12,8">
+                    <StackPanel>
+                        <Button Command="{Binding BackCommand}"
+                                Style="{StaticResource PowerGhostButton}"
+                                HorizontalContentAlignment="Left"
+                                FontSize="12.5"
+                                MinHeight="34"
+                                Padding="11,6"
+                                AutomationProperties.Name="Zurück zum Hauptmenü">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE72B;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                                <TextBlock Text="Hauptmenü"/>
+                            </StackPanel>
+                        </Button>
+                        <StackPanel Orientation="Horizontal" Margin="2,14,0,0">
+                            <Border Width="3" Height="18" CornerRadius="2" Background="{StaticResource ModuleGallery}" Margin="0,0,9,0"/>
+                            <TextBlock Text="Galerie" FontSize="15" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="8,0,8,12">
+                    <StackPanel>
+                        <Button Command="{Binding ShowAllCommand}"
+                                Style="{StaticResource NavButtonAll}"
+                                AutomationProperties.Name="Galerie, Fotos und Videos">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xF0E2;" Style="{StaticResource NavGlyph}"/>
+                                <TextBlock Text="Galerie"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Command="{Binding ShowPhotosCommand}"
+                                Style="{StaticResource NavButtonPhotos}"
+                                AutomationProperties.Name="Nur Fotos">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xEB9F;" Style="{StaticResource NavGlyph}"/>
+                                <TextBlock Text="Fotos"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Command="{Binding ShowVideosCommand}"
+                                Style="{StaticResource NavButtonVideos}"
+                                AutomationProperties.Name="Nur Videos">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE714;" Style="{StaticResource NavGlyph}"/>
+                                <TextBlock Text="Videos"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Command="{Binding ShowFavoritesCommand}"
+                                Style="{StaticResource NavButtonFavorites}"
+                                AutomationProperties.Name="Favoriten">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xEB52;" Style="{StaticResource NavGlyph}"/>
+                                <TextBlock Text="Favoriten"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Command="{Binding ShowNotesCommand}"
+                                Style="{StaticResource NavButtonNotes}"
+                                AutomationProperties.Name="Hinweise">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE946;" Style="{StaticResource NavGlyph}"/>
+                                    <TextBlock Text="Hinweise"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding NotesCountText}"
+                                           Style="{StaticResource CountText}"
+                                           HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button>
+
+                        <!-- Alben -->
+                        <Border Background="{StaticResource PowerRow}"
+                                BorderBrush="{StaticResource PowerBorderSoft}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="9,5"
+                                Margin="2,16,2,0"
+                                ToolTip="Alben und Tags beziehen sich auf diesen Ordner"
+                                Visibility="{Binding HasScope, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" FontSize="10" Foreground="{StaticResource ModuleGallery}" Margin="0,0,7,0"/>
+                                <TextBlock Text="{Binding ScopeText}"
+                                           FontSize="10.5"
+                                           Foreground="{StaticResource PowerMuted}"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="ALBEN" Style="{StaticResource NavSection}"/>
+                        <Grid Margin="2,0,2,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding NewAlbumName, UpdateSourceTrigger=PropertyChanged}"
+                                     Tag="Neues Album"
+                                     FontSize="11.5"
+                                     AutomationProperties.Name="Name des neuen Albums"/>
+                            <Button Grid.Column="1"
+                                    Command="{Binding CreateAlbumCommand}"
+                                    Style="{StaticResource PowerIconButton}"
+                                    Margin="6,0,0,0"
+                                    Content="&#xE710;"
+                                    FontFamily="Segoe MDL2 Assets"
+                                    ToolTip="Album anlegen"
+                                    AutomationProperties.Name="Album anlegen"/>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding VisibleAlbums}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Button Style="{StaticResource NavButton}"
+                                                Command="{Binding DataContext.OpenAlbumCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                ToolTip="{Binding Name}"
+                                                Visibility="{Binding IsRenaming, Converter={StaticResource InverseBoolToVisibility}}"
+                                                AutomationProperties.Name="{Binding Name}">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Umbenennen"
+                                                              Tag="&#xE8AC;"
+                                                              Command="{Binding PlacementTarget.Tag.RenameAlbumCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="Album entfernen"
+                                                              Tag="&#xE74D;"
+                                                              ToolTip="Nur das Album verschwindet — Bilder und Videos bleiben liegen."
+                                                              Command="{Binding PlacementTarget.Tag.DeleteAlbumCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="&#xE838;" Style="{StaticResource NavGlyph}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding ScopedCount}" Style="{StaticResource CountText}" Margin="8,0,0,0"/>
+                                            </Grid>
+                                        </Button>
+                                        <TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource RenameBox}"
+                                                 IsVisibleChanged="RenameBox_IsVisibleChanged"
+                                                 KeyDown="RenameBox_KeyDown"
+                                                 LostFocus="RenameBox_LostFocus"
+                                                 AutomationProperties.Name="Album umbenennen"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Tags -->
+                        <TextBlock Text="TAGS" Style="{StaticResource NavSection}"/>
+                        <Grid Margin="2,0,2,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding NewTagName, UpdateSourceTrigger=PropertyChanged}"
+                                     Tag="Neuer Tag"
+                                     FontSize="11.5"
+                                     AutomationProperties.Name="Name des neuen Tags"/>
+                            <Button Grid.Column="1"
+                                    Command="{Binding CreateTagCommand}"
+                                    Style="{StaticResource PowerIconButton}"
+                                    Margin="6,0,0,0"
+                                    Content="&#xE710;"
+                                    FontFamily="Segoe MDL2 Assets"
+                                    ToolTip="Tag anlegen"
+                                    AutomationProperties.Name="Tag anlegen"/>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding TagList}" Margin="2,0,0,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Button Style="{StaticResource ChipButton}"
+                                                Command="{Binding DataContext.OpenTagCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                Visibility="{Binding IsRenaming, Converter={StaticResource InverseBoolToVisibility}}"
+                                                AutomationProperties.Name="{Binding Label}">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Umbenennen"
+                                                              Tag="&#xE8AC;"
+                                                              Command="{Binding PlacementTarget.Tag.RenameTagCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="Tag entfernen"
+                                                              Tag="&#xE74D;"
+                                                              ToolTip="Der Tag verschwindet von allen Einträgen — die Dateien bleiben liegen."
+                                                              Command="{Binding PlacementTarget.Tag.DeleteTagCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Label}" Foreground="{StaticResource ModuleGallery}"/>
+                                                <TextBlock Text="{Binding Count}" Style="{StaticResource CountText}" Margin="6,0,0,0"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource RenameBox}"
+                                                 Width="110"
+                                                 Margin="0,0,6,6"
+                                                 IsVisibleChanged="RenameBox_IsVisibleChanged"
+                                                 KeyDown="RenameBox_KeyDown"
+                                                 LostFocus="RenameBox_LostFocus"
+                                                 AutomationProperties.Name="Tag umbenennen"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="Noch keine Tags vergeben."
+                                   Foreground="{StaticResource PowerMuted}"
+                                   FontSize="11"
+                                   Margin="10,0,0,0"
+                                   TextWrapping="Wrap">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding TagList.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <!-- Ordner -->
+                        <TextBlock Text="ORDNER" Style="{StaticResource NavSection}"/>
+                        <ItemsControl ItemsSource="{Binding Roots}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ToggleButton IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                                          Style="{StaticResource TreeChevron}"
+                                                          Height="34"
+                                                          ToolTip="Unterordner ein- und ausklappen"
+                                                          AutomationProperties.Name="Unterordner ein- und ausklappen"/>
+                                            <Button Grid.Column="1"
+                                                    Style="{StaticResource NavButton}"
+                                                    Command="{Binding DataContext.OpenRootCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    ToolTip="{Binding Path}"
+                                                    AutomationProperties.Name="{Binding Name}">
+                                                <Button.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Aus der Bibliothek nehmen"
+                                                                  Tag="&#xE738;"
+                                                                  ToolTip="Nur die Anzeige endet — der Ordner und alle Dateien bleiben, wo sie sind."
+                                                                  Command="{Binding PlacementTarget.Tag.RemoveRootCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                    </ContextMenu>
+                                                </Button.ContextMenu>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="&#xE8B7;" Style="{StaticResource NavGlyph}"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding Count}" Style="{StaticResource CountText}" Margin="8,0,0,0"/>
+                                                </Grid>
+                                            </Button>
+                                        </Grid>
+
+                                        <!-- Die Unterordner, die dieser Ordner mitgebracht hat -->
+                                        <ItemsControl ItemsSource="{Binding Subfolders}"
+                                                      Margin="16,0,0,0"
+                                                      Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibility}}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Command="{Binding AddRootCommand}"
+                                Style="{StaticResource NavButton}"
+                                Margin="0,4,0,0"
+                                AutomationProperties.Name="Ordner hinzufügen">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xED25;" Style="{StaticResource NavGlyph}" Foreground="{StaticResource ModuleGallery}"/>
+                                <TextBlock Text="Ordner hinzufügen" Foreground="{StaticResource ModuleGallery}"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ===================== Inhalt ===================== -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Kopfzeile mit Suche -->
+            <Border Style="{StaticResource ViewHeader}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel MinWidth="190">
+                        <TextBlock Text="{Binding Headline}" FontSize="17" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding Subline}" Foreground="{StaticResource PowerMuted}" FontSize="11" Margin="0,2,0,0"/>
+                    </StackPanel>
+
+                    <Grid Grid.Column="1" Margin="20,0,16,0" MaxWidth="620">
+                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=180}"
+                                 Tag="Name, #tag oder Ordner suchen"
+                                 Padding="34,7,30,7"
+                                 AutomationProperties.Name="Bibliothek durchsuchen"/>
+                        <TextBlock Text="&#xE721;"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="13"
+                                   Foreground="{StaticResource PowerMuted}"
+                                   HorizontalAlignment="Left"
+                                   Margin="12,0,0,0"
+                                   IsHitTestVisible="False"/>
+                        <Button Command="{Binding ClearSearchCommand}"
+                                Style="{StaticResource PowerIconButton}"
+                                HorizontalAlignment="Right"
+                                Margin="0,0,4,0"
+                                Width="24"
+                                Height="24"
+                                MinWidth="0"
+                                MinHeight="0"
+                                Content="&#xE711;"
+                                FontFamily="Segoe MDL2 Assets"
+                                FontSize="10"
+                                Visibility="{Binding HasSearch, Converter={StaticResource BoolToVisibility}}"
+                                AutomationProperties.Name="Suche zurücksetzen"/>
+                    </Grid>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Filters}"
+                                  SelectedItem="{Binding Filter}"
+                                  MinWidth="126"
+                                  Margin="0,0,8,0"
+                                  ToolTip="Fotos, Videos oder beides"
+                                  AutomationProperties.Name="Nach Art filtern"/>
+                        <ComboBox ItemsSource="{Binding Sorts}"
+                                  SelectedItem="{Binding Sort}"
+                                  MinWidth="152"
+                                  Margin="0,0,10,0"
+                                  ToolTip="Sortierung - gilt auch in Alben, Tags und Ordnern"
+                                  AutomationProperties.Name="Sortierung"/>
+                        <Button Command="{Binding SelectAllCommand}"
+                                Margin="0,0,8,0"
+                                ToolTip="Alle Einträge dieser Sicht auswählen"
+                                AutomationProperties.Name="Alle auswählen">
+                            <TextBlock Text="&#xE8B3;" FontFamily="Segoe MDL2 Assets"/>
+                        </Button>
+                        <Button Command="{Binding RescanCommand}"
+                                AutomationProperties.Name="Ordner neu einlesen">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" Margin="0,0,7,0"/>
+                                <TextBlock Text="Neu einlesen"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Auswahlleiste: oben was den Eintrag selbst betrifft, unten die Alben -->
+            <Border Grid.Row="1"
+                    Background="{StaticResource PowerCard}"
+                    BorderBrush="{StaticResource PowerBorderSoft}"
+                    BorderThickness="0,0,0,1"
+                    Padding="16,9"
+                    Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Border Background="{StaticResource PowerPrimary}" CornerRadius="5" Padding="9,3">
+                                <TextBlock Text="{Binding SelectionText}" FontSize="11.5" FontWeight="SemiBold" Foreground="White"/>
+                            </Border>
+                            <Button Command="{Binding FavoriteSelectionCommand}" Margin="10,0,0,0" ToolTip="Als Favorit markieren" AutomationProperties.Name="Auswahl als Favorit markieren">
+                                <TextBlock Text="&#xEB52;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource ModuleCut}"/>
+                            </Button>
+                            <Button Command="{Binding UnfavoriteSelectionCommand}" Margin="6,0,0,0" ToolTip="Favorit entfernen" AutomationProperties.Name="Favorit der Auswahl entfernen">
+                                <TextBlock Text="&#xEB51;" FontFamily="Segoe MDL2 Assets"/>
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="16,0,16,0">
+                            <TextBox Text="{Binding TagInput, UpdateSourceTrigger=PropertyChanged}"
+                                     Tag="Tags, durch Leerzeichen getrennt"
+                                     MinWidth="180"
+                                     Margin="0,0,7,0"
+                                     ToolTip="Mehrere Tags mit Leerzeichen trennen"
+                                     AutomationProperties.Name="Tags für die Auswahl"/>
+                            <Button Command="{Binding TagSelectionCommand}" Margin="0,0,6,0" AutomationProperties.Name="Tags hinzufügen">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Tags"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding UntagSelectionCommand}" ToolTip="Diese Tags von der Auswahl entfernen" AutomationProperties.Name="Tags entfernen">
+                                <TextBlock Text="&#xE738;" FontFamily="Segoe MDL2 Assets"/>
+                            </Button>
+                        </StackPanel>
+
+                        <Button Grid.Column="2" Command="{Binding ClearSelectionCommand}" AutomationProperties.Name="Auswahl aufheben">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                <TextBlock Text="Auswahl aufheben"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- Alben: mehrere zugleich anhakbar, die Marke zeigt wie viel schon drin liegt -->
+                    <Grid Margin="0,9,0,0">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Albums.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Alben" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" Margin="0,7,12,0"/>
+
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Albums}" Margin="0,0,12,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <ToggleButton IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                                  Style="{StaticResource AlbumChip}"
+                                                  ToolTip="Album als Ziel an- oder abwählen"
+                                                  AutomationProperties.Name="{Binding Name}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" FontSize="11.5"/>
+                                            <Border Background="#33000000"
+                                                    CornerRadius="4"
+                                                    Padding="5,1"
+                                                    Margin="7,0,0,0"
+                                                    ToolTip="So viele der ausgewählten Einträge liegen schon darin"
+                                                    Visibility="{Binding HasSelectionHint, Converter={StaticResource BoolToVisibility}}">
+                                                <TextBlock Text="{Binding SelectionHint}"
+                                                           FontFamily="Consolas"
+                                                           FontSize="10"
+                                                           Foreground="{StaticResource ModuleGallery}"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </ToggleButton>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+                            <Button Command="{Binding AddSelectionToAlbumCommand}"
+                                    ToolTip="Auswahl in alle angehakten Alben legen"
+                                    AutomationProperties.Name="Zu den angehakten Alben hinzufügen">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE838;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Ins Album"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding RemoveSelectionFromAlbumCommand}"
+                                    Margin="6,0,0,0"
+                                    ToolTip="Auswahl aus allen angehakten Alben entfernen"
+                                    AutomationProperties.Name="Aus den angehakten Alben entfernen">
+                                <TextBlock Text="&#xE8E6;" FontFamily="Segoe MDL2 Assets"/>
+                            </Button>
+                            <Button Command="{Binding ClearAlbumChoiceCommand}"
+                                    Margin="6,0,0,0"
+                                    ToolTip="Albumauswahl zurücksetzen"
+                                    AutomationProperties.Name="Albumauswahl zurücksetzen">
+                                <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Zeitleiste -->
+            <ScrollViewer x:Name="Timeline"
+                          Grid.Row="2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="16,16,10,16"
+                          ScrollChanged="OnTimelineScrolled">
+                <ItemsControl ItemsSource="{Binding Days}" ItemTemplate="{StaticResource DayTemplate}"/>
+            </ScrollViewer>
+
+            <!-- Leerer Zustand -->
+            <StackPanel Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        MaxWidth="420">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasItems}" Value="False">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsNotes}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="&#xEB9F;"
+                           FontFamily="Segoe MDL2 Assets"
+                           FontSize="44"
+                           Foreground="#3B4655"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding Subline}"
+                           Foreground="{StaticResource PowerMuted}"
+                           FontSize="13"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           Margin="0,14,0,0"/>
+                <!-- Favoriten bieten nichts an, ein Album will gefüllt werden, sonst hilft ein Ordner. -->
+                <Button Command="{Binding AddRootCommand}"
+                        Style="{StaticResource PowerPrimaryButton}"
+                        HorizontalAlignment="Center"
+                        Margin="0,16,0,0"
+                        Visibility="{Binding CanAddRootHere, Converter={StaticResource BoolToVisibility}}"
+                        AutomationProperties.Name="Ordner hinzufügen">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xED25;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                        <TextBlock Text="Ordner hinzufügen"/>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding FillAlbumCommand}"
+                        Style="{StaticResource PowerPrimaryButton}"
+                        HorizontalAlignment="Center"
+                        Margin="0,16,0,0"
+                        Visibility="{Binding IsAlbumOpen, Converter={StaticResource BoolToVisibility}}"
+                        AutomationProperties.Name="Bilder und Videos hinzufügen">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                        <TextBlock Text="Bilder/Videos hinzufügen"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- Hinweisbereich: doppelte und fehlerhafte Dateien -->
+            <ScrollViewer Grid.Row="2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="16,16,10,16"
+                          Visibility="{Binding IsNotes, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel MaxWidth="920" HorizontalAlignment="Left">
+
+                    <!-- Kopf: was hier passiert und der Anstoss dazu -->
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Bibliothek prüfen" FontSize="14" FontWeight="SemiBold"/>
+                                <TextBlock Text="Sucht Dateien, die mehrfach herumliegen, und solche, die sich nicht ansehen lassen — beschädigte, leere und Videos in einem Codec, den der Player nicht zeigt. Es wird nur gelesen: nichts wird verschoben, umbenannt oder gelöscht."
+                                           Foreground="{StaticResource PowerMuted}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Margin="0,6,16,0"/>
+                                <TextBlock Text="Ohne ffprobe lassen sich Videos nicht beurteilen — geprüft werden dann nur Fotos."
+                                           Foreground="{StaticResource PowerWarning}"
+                                           FontSize="11.5"
+                                           TextWrapping="Wrap"
+                                           Margin="0,8,16,0"
+                                           Visibility="{Binding CanProbeVideos, Converter={StaticResource InverseBoolToVisibility}}"/>
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    Command="{Binding CheckCommand}"
+                                    Style="{StaticResource PowerPrimaryButton}"
+                                    VerticalAlignment="Center"
+                                    AutomationProperties.Name="Bibliothek prüfen">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Jetzt prüfen"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Entwarnung, wenn die Prüfung nichts gefunden hat -->
+                    <Border Style="{StaticResource CardBorder}"
+                            Margin="0,12,0,0"
+                            Visibility="{Binding IsClean, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE930;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="16"
+                                       Foreground="{StaticResource PowerSuccess}"
+                                       Margin="0,0,10,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="Nichts gefunden — keine Duplikate, keine fehlerhaften Dateien."
+                                       FontSize="12.5"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Duplikate -->
+                    <StackPanel Visibility="{Binding HasDuplicates, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="{Binding DuplicateHeader}" Style="{StaticResource SectionTitle}" Margin="2,20,0,9"/>
+                        <ItemsControl ItemsSource="{Binding Duplicates}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:GalleryDuplicateGroup}">
+                                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,9">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,7">
+                                                <TextBlock Text="{Binding Header}"
+                                                           FontSize="12.5"
+                                                           FontWeight="SemiBold"
+                                                           Margin="0,0,90,0"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding WastedText}"
+                                                           Style="{StaticResource MetaText}"
+                                                           HorizontalAlignment="Right"/>
+                                            </Grid>
+                                            <ItemsControl ItemsSource="{Binding Items}"
+                                                          ItemTemplate="{StaticResource IssueRow}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <!-- Fehlerhafte Dateien -->
+                    <StackPanel Visibility="{Binding HasBroken, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="{Binding BrokenHeader}" Style="{StaticResource SectionTitle}" Margin="2,20,0,9"/>
+                        <Border Style="{StaticResource CardBorder}">
+                            <ItemsControl ItemsSource="{Binding Broken}" ItemTemplate="{StaticResource IssueRow}"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Fußzeile -->
+            <Border Grid.Row="3"
+                    Background="{StaticResource PowerSidebar}"
+                    BorderBrush="{StaticResource PowerBorderSoft}"
+                    BorderThickness="0,1,0,0"
+                    Padding="16,7">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <ProgressBar IsIndeterminate="True"
+                                     Width="90"
+                                     Height="4"
+                                     Margin="0,0,10,0"
+                                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"/>
+                        <TextBlock Text="{Binding Status}" Style="{StaticResource MetaText}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="16,0,14,0">
+                        <TextBlock Text="&#xEDA2;" FontFamily="Segoe MDL2 Assets" FontSize="11" Foreground="{StaticResource PowerMuted}" Margin="0,0,7,0"/>
+                        <TextBlock Text="{Binding StorageText}"
+                                   Style="{StaticResource MetaText}"
+                                   ToolTip="Platzbedarf der Bilder und Videos in den aufgenommenen Ordnern"/>
+                    </StackPanel>
+                    <Button Grid.Column="2"
+                            Command="{Binding ClearThumbnailsCommand}"
+                            Style="{StaticResource PowerLinkButton}"
+                            ToolTip="Zwischengespeicherte Vorschaubilder löschen und neu erzeugen"
+                            AutomationProperties.Name="Vorschaubilder neu erzeugen">
+                        <TextBlock Text="Vorschaubilder neu aufbauen" FontSize="11"/>
+                    </Button>
+                    <Button Grid.Column="3"
+                            Command="{Binding OpenDataFolderCommand}"
+                            Style="{StaticResource PowerLinkButton}"
+                            Margin="8,0,0,0"
+                            ToolTip="{Binding DataFolder, StringFormat=Ordner mit library.json im Explorer öffnen ({0})}"
+                            AutomationProperties.Name="Ordner der Bibliotheksdatei öffnen">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE838;" FontFamily="Segoe MDL2 Assets" FontSize="11" Margin="0,0,7,0"/>
+                            <TextBlock Text="JSON-Ordner öffnen" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ===================== Einzelansicht ===================== -->
+        <Grid Grid.ColumnSpan="2"
+              Background="#F2101419"
+              Visibility="{Binding IsViewerOpen, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="308"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Margin="16">
+                <Image Source="{Binding ViewerImage}" Stretch="Uniform"/>
+                <MediaElement x:Name="ViewerPlayer"
+                              Source="{Binding ViewerVideo}"
+                              LoadedBehavior="Manual"
+                              UnloadedBehavior="Manual"
+                              Stretch="Uniform"
+                              Volume="{Binding Value, ElementName=ViewerVolume, Mode=OneWay}"
+                              MediaOpened="ViewerPlayer_MediaOpened"
+                              MediaEnded="ViewerPlayer_MediaEnded"
+                              Visibility="{Binding IsViewerVideo, Converter={StaticResource BoolToVisibility}}"/>
+
+                <Button Command="{Binding ViewerPreviousCommand}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource TileBadgeButton}"
+                        Width="42"
+                        Height="42"
+                        AutomationProperties.Name="Vorheriger Eintrag">
+                    <TextBlock Text="&#xE76B;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White"/>
+                </Button>
+                <Button Command="{Binding ViewerNextCommand}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource TileBadgeButton}"
+                        Width="42"
+                        Height="42"
+                        AutomationProperties.Name="Nächster Eintrag">
+                    <TextBlock Text="&#xE76C;" FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="White"/>
+                </Button>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,0,6"
+                            Visibility="{Binding IsViewerVideo, Converter={StaticResource BoolToVisibility}}">
+                    <Button Click="ViewerToggle_Click" Style="{StaticResource TileBadgeButton}" Width="34" Height="34" AutomationProperties.Name="Wiedergabe umschalten">
+                        <TextBlock x:Name="ViewerToggleGlyph" Text="&#xE769;" FontFamily="Segoe MDL2 Assets" FontSize="13" Foreground="White"/>
+                    </Button>
+                    <Slider x:Name="ViewerVolume" Minimum="0" Maximum="1" Value=".7" Width="110" Margin="12,0,0,0" AutomationProperties.Name="Lautstärke"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Angaben zum Eintrag -->
+            <Border Grid.Column="1"
+                    Background="{StaticResource PowerSidebar}"
+                    BorderBrush="{StaticResource PowerBorderSoft}"
+                    BorderThickness="1,0,0,0">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Padding="14,12" BorderBrush="{StaticResource PowerBorderSoft}" BorderThickness="0,0,0,1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Current.Name}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTip="{Binding Current.FullPath}"/>
+                            <Button Grid.Column="1"
+                                    Command="{Binding ToggleFavoriteCommand}"
+                                    Style="{StaticResource PowerIconButton}"
+                                    Margin="8,0,6,0"
+                                    ToolTip="Favorit"
+                                    AutomationProperties.Name="Favorit umschalten">
+                                <TextBlock FontFamily="Segoe MDL2 Assets">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="&#xEB51;"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Current.IsFavorite}" Value="True">
+                                                    <Setter Property="Text" Value="&#xEB52;"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource ModuleCut}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Click="ViewerClose_Click"
+                                    Style="{StaticResource PowerIconButton}"
+                                    Content="&#xE711;"
+                                    FontFamily="Segoe MDL2 Assets"
+                                    ToolTip="Schließen (Esc)"
+                                    AutomationProperties.Name="Einzelansicht schließen"/>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="14,12">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Current.TakenText}" Style="{StaticResource ViewerMeta}"/>
+                            <TextBlock Style="{StaticResource ViewerMeta}">
+                                <Run Text="{Binding Current.SizeText, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Current.FolderText, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Text="{Binding Current.FullPath}" Style="{StaticResource MetaText}" TextWrapping="Wrap" Margin="0,0,0,14"/>
+
+                            <TextBlock Text="Tags" Style="{StaticResource SectionTitle}"/>
+                            <!-- Aufklappbares Menü über alle angelegten Tags; zugeklappt steht dort die Anzahl -->
+                            <Grid>
+                                <ToggleButton x:Name="TagMenu"
+                                              Style="{StaticResource MenuButton}"
+                                              Tag="&#xE8EC;"
+                                              Content="{Binding CurrentTagsText}"
+                                              ToolTip="Tags dieses Eintrags"
+                                              AutomationProperties.Name="Tags dieses Eintrags"/>
+                                <Popup x:Name="TagPopup"
+                                       IsOpen="{Binding IsChecked, ElementName=TagMenu, Mode=TwoWay}"
+                                       PlacementTarget="{Binding ElementName=TagMenu}"
+                                       Placement="Bottom"
+                                       StaysOpen="False"
+                                       AllowsTransparency="True"
+                                       PopupAnimation="Fade"
+                                       VerticalOffset="4">
+                                    <Border Background="{StaticResource PowerCard}"
+                                            BorderBrush="{StaticResource PowerBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="5"
+                                            MinWidth="252">
+                                        <StackPanel>
+                                            <ScrollViewer MaxHeight="280" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding CurrentTags}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <CheckBox IsChecked="{Binding IsMember, Mode=TwoWay}"
+                                                                      Content="{Binding Label}"
+                                                                      Style="{StaticResource MenuCheck}"
+                                                                      AutomationProperties.Name="{Binding Label}"/>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                            <TextBlock Text="Noch kein Tag angelegt."
+                                                       Foreground="{StaticResource PowerMuted}"
+                                                       FontSize="11.5"
+                                                       Margin="9,6">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding CurrentTags.Count}" Value="0">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                            <Grid Margin="0,7,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding ItemTagName, UpdateSourceTrigger=PropertyChanged}"
+                                         Tag="Neuer Tag"
+                                         AutomationProperties.Name="Neuen Tag für diesen Eintrag"/>
+                                <Button Grid.Column="1"
+                                        Command="{Binding AddItemTagCommand}"
+                                        Style="{StaticResource PowerIconButton}"
+                                        Margin="6,0,0,0"
+                                        Content="&#xE710;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        ToolTip="Tag anlegen und diesem Eintrag geben"
+                                        AutomationProperties.Name="Tag hinzufügen"/>
+                            </Grid>
+
+                            <TextBlock Text="Alben" Style="{StaticResource SectionTitle}" Margin="0,18,0,9"/>
+                            <!-- Aufklappbares Menü: mehrere Alben zugleich, zugeklappt steht dort die Anzahl -->
+                            <Grid>
+                                <ToggleButton x:Name="AlbumMenu"
+                                              Style="{StaticResource MenuButton}"
+                                              Tag="&#xE838;"
+                                              Content="{Binding CurrentAlbumsText}"
+                                              ToolTip="Alben dieses Eintrags"
+                                              AutomationProperties.Name="Alben dieses Eintrags"/>
+                                <Popup x:Name="AlbumPopup"
+                                       IsOpen="{Binding IsChecked, ElementName=AlbumMenu, Mode=TwoWay}"
+                                       PlacementTarget="{Binding ElementName=AlbumMenu}"
+                                       Placement="Bottom"
+                                       StaysOpen="False"
+                                       AllowsTransparency="True"
+                                       PopupAnimation="Fade"
+                                       HorizontalOffset="0"
+                                       VerticalOffset="4">
+                                    <Border Background="{StaticResource PowerCard}"
+                                            BorderBrush="{StaticResource PowerBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="5"
+                                            MinWidth="252">
+                                        <StackPanel>
+                                            <ScrollViewer MaxHeight="280" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding CurrentAlbums}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <CheckBox IsChecked="{Binding IsMember, Mode=TwoWay}"
+                                                                      Content="{Binding Name}"
+                                                                      Style="{StaticResource MenuCheck}"
+                                                                      AutomationProperties.Name="{Binding Name}"/>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                            <TextBlock Text="Noch kein Album angelegt."
+                                                       Foreground="{StaticResource PowerMuted}"
+                                                       FontSize="11.5"
+                                                       Margin="9,6">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding CurrentAlbums.Count}" Value="0">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+
+                            <TextBlock Text="Datei" Style="{StaticResource SectionTitle}" Margin="0,18,0,9"/>
+                            <Button Command="{Binding OpenExternalCommand}" HorizontalAlignment="Stretch" Margin="0,0,0,6" AutomationProperties.Name="Mit Standardprogramm öffnen">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8E5;" FontFamily="Segoe MDL2 Assets" Margin="0,0,7,0"/>
+                                    <TextBlock Text="Mit Standardprogramm öffnen"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding RevealCommand}" HorizontalAlignment="Stretch" AutomationProperties.Name="Im Explorer zeigen">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xEC50;" FontFamily="Segoe MDL2 Assets" Margin="0,0,7,0"/>
+                                    <TextBlock Text="Im Explorer zeigen"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

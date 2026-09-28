@@ -1,0 +1,11 @@
+<Window x:Class="MediaForge.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding WindowTitle}"
+        Icon="/MediaForge;component/Assets/icon.png"
+        Width="1550" Height="1075" MinWidth="1180" MinHeight="740"
+        WindowStartupLocation="CenterScreen" Background="{StaticResource BackgroundBrush}">
+    <Grid>
+        <ContentControl Content="{Binding CurrentPage}" KeyboardNavigation.TabNavigation="Cycle"/>
+    </Grid>
+</Window>

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+    <AssemblyName>MediaForge</AssemblyName>
+    <RootNamespace>MediaForge</RootNamespace>
+    <Platforms>x64</Platforms>
+    <Product>MediaForge</Product>
+    <Company>MediaForge</Company>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <!-- Release: keine Debug-Symbole und keine lokalen Build-Pfade in der Exe. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <Deterministic>true</Deterministic>
+    <PathMap>$(MSBuildProjectDirectory)=MediaForge</PathMap>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon.ico" />
+    <Resource Include="Assets\icon.png" />
+  </ItemGroup>
+</Project>

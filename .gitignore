@@ -1,0 +1,23 @@
+.dotnet-sdk/
+.dotnet-home/
+.nuget-packages/
+**/bin/
+**/obj/
+artifacts/
+.tools/
+dist/
+release/
+*.lnk
+
+# Persönliche Altdaten und Werkzeuge – nicht veröffentlichen
+kontext und alt/
+cookies*.txt
+yt-dlp.exe
+ffmpeg.exe
+ffprobe.exe
+ffplay.exe
+.dotnet-install.ps1
+.claude/
+.vs/
+*.user
+**/publish/

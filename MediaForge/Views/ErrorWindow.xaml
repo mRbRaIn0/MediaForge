@@ -1,0 +1,50 @@
+<Window x:Class="MediaForge.Views.ErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Fehlerhafte Downloads"
+        Width="680" Height="460"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        Background="{StaticResource PowerBackground}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+            <Border Width="3" Height="22" CornerRadius="2" Background="{StaticResource PowerDanger}" Margin="0,0,11,0"/>
+            <TextBlock Text="{Binding FailedCount, StringFormat={}{0} Downloads fehlgeschlagen oder übersprungen}"
+                       FontSize="16" FontWeight="Bold"/>
+        </StackPanel>
+        <TextBox x:Name="ContentBox"
+                 Grid.Row="1"
+                 Text="{Binding FailedJobsText, Mode=OneWay}"
+                 Style="{StaticResource PowerTerminalBox}"
+                 AutomationProperties.Name="Liste der fehlgeschlagenen Downloads"/>
+        <Grid Grid.Row="2" Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Click="Copy_Click" MinWidth="140" AutomationProperties.Name="Liste kopieren">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE8C8;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                    <TextBlock Text="Kopieren"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2"
+                    Command="{Binding RetryFailedCommand}"
+                    Click="Retry_Click"
+                    Style="{StaticResource PowerPrimaryButton}"
+                    MinWidth="180"
+                    AutomationProperties.Name="Fehlgeschlagene Downloads erneut versuchen">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                    <TextBlock Text="Erneut versuchen"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

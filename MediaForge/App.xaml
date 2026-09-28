@@ -1,0 +1,31 @@
+<Application x:Class="MediaForge.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:core="clr-namespace:MediaForge.Core"
+             xmlns:vm="clr-namespace:MediaForge.ViewModels"
+             xmlns:views="clr-namespace:MediaForge.Views">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MediaForge;component/Themes/PowerTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+            <core:StringEqualsConverter x:Key="StringEquals"/>
+            <core:InverseBooleanConverter x:Key="InverseBoolean"/>
+            <core:BooleanToOpacityConverter x:Key="BoolToOpacity"/>
+            <core:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility"/>
+            <core:OneBasedIndexConverter x:Key="OneBasedIndex"/>
+
+            <DataTemplate DataType="{x:Type vm:HomeViewModel}"><views:HomeView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:DownloadViewModel}"><views:DownloadView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:CutViewModel}"><views:CutView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:EditorViewModel}"><views:EditorView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ConvertViewModel}"><views:ConvertView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SpeedViewModel}"><views:SpeedView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:LinkViewModel}"><views:LinkView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SorterViewModel}"><views:SorterView/></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:GalleryViewModel}"><views:GalleryView/></DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,511 @@
+<UserControl x:Class="MediaForge.Views.DownloadView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignWidth="1452"
+             d:DesignHeight="1050"
+             Background="#131820"
+             Foreground="#EEF2F7"
+             KeyboardNavigation.TabNavigation="Cycle">
+
+    <Grid Background="{StaticResource PowerBackground}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="278"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Margin="14,12,7,14"
+                Style="{StaticResource PowerCardStyle}"
+                Background="{StaticResource PowerSidebar}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          CanContentScroll="False">
+                <StackPanel Margin="20,16,18,18">
+                    <Button Command="{Binding BackCommand}"
+                            Style="{StaticResource PowerButton}"
+                            Padding="9,5"
+                            MinHeight="30"
+                            HorizontalAlignment="Left"
+                            AutomationProperties.Name="Zurück zum Hauptmenü">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE72B;" FontFamily="Segoe MDL2 Assets" Margin="0,0,7,0"/>
+                            <TextBlock Text="Hauptmenü" FontSize="11.5"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Text="Steuerung" FontSize="15" FontWeight="SemiBold" Margin="2,15,0,12"/>
+
+                    <Button Command="{Binding StartCommand}"
+                            Style="{StaticResource PowerPrimaryButton}"
+                            AutomationProperties.Name="Download-Warteschlange starten">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                            <TextBlock Text="Queue Starten"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding AddJobCommand}"
+                            Style="{StaticResource PowerButton}"
+                            Margin="0,10,0,0"
+                            AutomationProperties.Name="URL zur Warteschlange hinzufügen">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                            <TextBlock Text="Hinzufügen"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Height="1" Background="{StaticResource PowerBorder}" Margin="0,14,0,14"/>
+
+                    <TextBlock Text="Manueller Eintrag" FontSize="12" FontWeight="SemiBold" Margin="2,0,0,8"/>
+                    <TextBox x:Name="UrlEntry"
+                             Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+                             Tag="URL einfügen..."
+                             Style="{StaticResource PowerInput}"
+                             AutomationProperties.Name="Video-URL">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding AddJobCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+
+                    <ItemsControl ItemsSource="{Binding TimeSegments}" Margin="0,10,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,7">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="38"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="38"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="38"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="34"/>
+                                        <RowDefinition Height="34"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource PowerMuted}" FontSize="10"/>
+                                    <TextBox Grid.Column="1" Text="{Binding StartHours, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PowerTimeInput}" AutomationProperties.Name="Start Stunden"/>
+                                    <TextBlock Grid.Column="2" Text=":" Foreground="{StaticResource PowerMuted}" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Column="3" Text="{Binding StartMinutes, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PowerTimeInput}" AutomationProperties.Name="Start Minuten"/>
+                                    <TextBlock Grid.Column="4" Text=":" Foreground="{StaticResource PowerMuted}" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Column="5" Text="{Binding StartSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PowerTimeInput}" AutomationProperties.Name="Start Sekunden"/>
+
+                                    <TextBlock Grid.Row="1" Text="&#xE71A;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource PowerMuted}" FontSize="11"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EndHours, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PowerTimeInput}" AutomationProperties.Name="Ende Stunden"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text=":" Foreground="{StaticResource PowerMuted}" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding EndMinutes, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PowerTimeInput}" AutomationProperties.Name="Ende Minuten"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="4" Text=":" Foreground="{StaticResource PowerMuted}" HorizontalAlignment="Center"/>
+                                    <TextBox Grid.Row="1" Grid.Column="5" Text="{Binding EndSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PowerTimeInput}" AutomationProperties.Name="Ende Sekunden"/>
+                                    <Button Grid.Row="1"
+                                            Grid.Column="6"
+                                            Command="{Binding DataContext.RemoveTimeSegmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Style="{StaticResource PowerButton}"
+                                            Width="29"
+                                            Height="29"
+                                            MinHeight="29"
+                                            Padding="2"
+                                            HorizontalAlignment="Right"
+                                            ToolTip="Abschnitt entfernen"
+                                            AutomationProperties.Name="Zeitabschnitt entfernen">
+                                        <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="11"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="Zeitabschnitte (optional)" Foreground="{StaticResource PowerMuted}" FontSize="10.5" Margin="2,0,0,7"/>
+                    <Button Command="{Binding AddTimeSegmentCommand}"
+                            Style="{StaticResource PowerButton}"
+                            Padding="9,5"
+                            MinHeight="32"
+                            AutomationProperties.Name="Weiteren Zeitabschnitt hinzufügen">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" Margin="0,0,7,0"/>
+                            <TextBlock Text="Weiterer Abschnitt"/>
+                        </StackPanel>
+                    </Button>
+
+                    <StackPanel Margin="0,12,0,5">
+                        <RadioButton Content="Video (Best)"
+                                     GroupName="DownloadMode"
+                                     IsChecked="{Binding Mode, Converter={StaticResource StringEquals}, ConverterParameter=video, Mode=TwoWay}"
+                                     Style="{StaticResource PowerRadio}"
+                                     AutomationProperties.Name="Als Video herunterladen"/>
+                        <RadioButton Content="Audio (MP3)"
+                                     GroupName="DownloadMode"
+                                     IsChecked="{Binding Mode, Converter={StaticResource StringEquals}, ConverterParameter=mp3, Mode=TwoWay}"
+                                     Style="{StaticResource PowerRadio}"
+                                     AutomationProperties.Name="Als Audio herunterladen"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Qualität / Auflösung" Foreground="{StaticResource PowerMuted}" FontSize="10.5" Margin="2,6,0,5"/>
+                    <ComboBox ItemsSource="{Binding AvailableQualities}" SelectedItem="{Binding Quality}" Style="{StaticResource PowerCombo}" AutomationProperties.Name="Qualität oder Auflösung"/>
+
+                    <TextBlock Text="Format" Foreground="{StaticResource PowerMuted}" FontSize="10.5" Margin="2,9,0,5"/>
+                    <ComboBox ItemsSource="{Binding AvailableFormats}" SelectedItem="{Binding Format}" Style="{StaticResource PowerCombo}" AutomationProperties.Name="Ausgabeformat"/>
+
+                    <TextBlock Text="Seitenverhältnis" Foreground="{StaticResource PowerMuted}" FontSize="10.5" Margin="2,9,0,5"/>
+                    <ComboBox ItemsSource="{Binding Ratios}" SelectedItem="{Binding Ratio}" IsEnabled="{Binding IsVideoMode}" Style="{StaticResource PowerCombo}" AutomationProperties.Name="Seitenverhältnis"/>
+
+                    <TextBlock Text="Encoder" Foreground="{StaticResource PowerMuted}" FontSize="10.5" Margin="2,9,0,5"/>
+                    <ComboBox ItemsSource="{Binding Encoders}" SelectedItem="{Binding Encoder}" IsEnabled="{Binding IsVideoMode}" Style="{StaticResource PowerCombo}" AutomationProperties.Name="Encoder"/>
+
+                    <TextBlock Text="AI Upscaler" Foreground="{StaticResource PowerMuted}" FontSize="10.5" Margin="2,9,0,5"/>
+                    <ComboBox ItemsSource="{Binding Upscalers}" SelectedItem="{Binding Upscaler}" IsEnabled="{Binding IsVideoMode}" Style="{StaticResource PowerCombo}" AutomationProperties.Name="AI Upscaler"/>
+
+                    <CheckBox Content="H.264 bevorzugen"
+                              IsChecked="{Binding PreferH264}"
+                              IsEnabled="{Binding IsVideoMode}"
+                              Style="{StaticResource PowerToggle}"
+                              Margin="0,13,0,1"
+                              ToolTip="Aktiv: bevorzugt kompatibles H.264, das bei YouTube gelegentlich nur bis 360p vorliegt. Aus: lädt den besten verfügbaren Videostream, z. B. VP9/AV1 in 1080p."
+                              AutomationProperties.Name="H.264 gegenüber höherer Videoauflösung bevorzugen"/>
+                    <CheckBox Content="Danach direkt in H.264 umwandeln"
+                              IsChecked="{Binding ConvertToH264}"
+                              IsEnabled="{Binding CanConvertToH264}"
+                              Style="{StaticResource PowerToggle}"
+                              Margin="0,1,0,1"
+                              ToolTip="Nur bei deaktivierter H.264-Priorität: lädt zuerst die beste Qualität und kodiert sie danach mit voller FFmpeg-Leistung in H.264."
+                              AutomationProperties.Name="Bestes Video nach dem Download in H.264 umwandeln"/>
+                    <CheckBox Content="YouTube-Thumbnail einbetten"
+                              IsChecked="{Binding EmbedThumbnail}"
+                              Style="{StaticResource PowerToggle}"
+                              Margin="0,1,0,1"
+                              ToolTip="Bettet das Quell-Thumbnail als Cover direkt in die fertige Medien-Datei ein."
+                              AutomationProperties.Name="YouTube Thumbnail als Cover in die Datei einbetten"/>
+                    <CheckBox Content="Originalvideo behalten"
+                              IsChecked="{Binding KeepOriginal}"
+                              IsEnabled="{Binding IsVideoMode}"
+                              Style="{StaticResource PowerToggle}"
+                              Margin="0,1,0,1"
+                              AutomationProperties.Name="Originalvideo behalten"/>
+                    <CheckBox Content="Eigenen Zielordner nutzen"
+                              IsChecked="{Binding UseMega}"
+                              Style="{StaticResource PowerToggle}"
+                              ToolTip="{Binding OutputDirectory}"
+                              AutomationProperties.Name="Eigenen Zielordner aus den Einstellungen nutzen"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="7,12,14,14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="198"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    Style="{StaticResource PowerCardStyle}"
+                    Padding="17,15"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="132"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="yt-dlp Befehl" FontSize="12.5" FontWeight="SemiBold" Margin="0,0,12,0"/>
+                    <TextBox Grid.Column="1"
+                             Text="{Binding RawCommand, UpdateSourceTrigger=PropertyChanged}"
+                             Tag="Kompletter yt-dlp Befehl ohne Voreinstellungen – z. B. yt-dlp -f bestaudio -x &lt;URL&gt;"
+                             Style="{StaticResource PowerInput}"
+                             FontFamily="Consolas"
+                             AutomationProperties.Name="Vollständiger yt-dlp Befehl">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding RawCommandCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Grid.Column="2"
+                            Command="{Binding RawCommandCommand}"
+                            Style="{StaticResource PowerPrimaryButton}"
+                            Margin="12,0,0,0"
+                            AutomationProperties.Name="yt-dlp Befehl ausführen">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE768;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                            <TextBlock Text="Ausführen"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="0,13,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="165"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Cookies:" Foreground="{StaticResource PowerMuted}" FontSize="11" Margin="0,0,9,0"/>
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding CookieOptions}"
+                                  SelectedItem="{Binding CookieSelection}"
+                                  Style="{StaticResource PowerCombo}"
+                                  AutomationProperties.Name="Cookies oder Browser auswählen"/>
+                        <Button Grid.Column="2"
+                                Command="{Binding ImportCommand}"
+                                Style="{StaticResource PowerButton}"
+                                Margin="11,0,0,0"
+                                AutomationProperties.Name="URLs aus urls.txt importieren">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8B7;" FontFamily="Segoe MDL2 Assets" Foreground="#9EB9FF" Margin="0,0,7,0"/>
+                                <TextBlock Text="Import urls.txt"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="4"
+                                Command="{Binding UpdateCommand}"
+                                Style="{StaticResource PowerButton}"
+                                Margin="10,0,0,0"
+                                AutomationProperties.Name="yt-dlp aktualisieren">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE896;" FontFamily="Segoe MDL2 Assets" Margin="0,0,7,0"/>
+                                <TextBlock Text="yt-dlp Update"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="5"
+                                Command="{Binding FfmpegUpdateCommand}"
+                                Style="{StaticResource PowerButton}"
+                                Margin="10,0,0,0"
+                                ToolTip="FFmpeg, FFplay und FFprobe herunterladen bzw. aktualisieren"
+                                AutomationProperties.Name="FFmpeg aktualisieren">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE895;" FontFamily="Segoe MDL2 Assets" Margin="0,0,7,0"/>
+                                <TextBlock Text="FFmpeg Update"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="6"
+                                Click="ShowErrors_Click"
+                                Style="{StaticResource PowerButton}"
+                                Margin="10,0,0,0"
+                                AutomationProperties.Name="Fehler anzeigen">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource PowerDanger}" Margin="0,0,7,0"/>
+                                <TextBlock Text="{Binding ErrorButtonText}"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1"
+                    Style="{StaticResource PowerCardStyle}"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Margin="18,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Warteschlange (Queue)" FontWeight="SemiBold" FontSize="14"/>
+                        <Border Grid.Column="1" Background="#27303C" CornerRadius="5" Padding="8,3" Margin="10,0,0,0">
+                            <TextBlock Text="{Binding JobCount}" Foreground="{StaticResource PowerMuted}" FontFamily="Consolas" FontSize="10.5"/>
+                        </Border>
+                        <TextBlock Grid.Column="3" Text="{Binding JobCountText}" Foreground="{StaticResource PowerMuted}" FontSize="11"/>
+                    </Grid>
+
+                    <Border Grid.Row="1" BorderBrush="{StaticResource PowerBorderSoft}" BorderThickness="0,1,0,0">
+                        <Grid Margin="16,0,16,16">
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasJobs}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Rectangle Margin="0,0,0,0"
+                                           Stroke="#35404F"
+                                           StrokeThickness="1"
+                                           StrokeDashArray="4 4"
+                                           RadiusX="11"
+                                           RadiusY="11"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Viewbox Width="54" Height="54" Margin="0,0,0,18">
+                                        <Path Data="M 4,17 L 8,8 L 24,8 L 28,17 L 28,26 L 4,26 Z M 4,17 L 11,17 L 13.5,20 L 18.5,20 L 21,17 L 28,17"
+                                              Stroke="#D7DCE5"
+                                              StrokeThickness="2.2"
+                                              StrokeStartLineCap="Round"
+                                              StrokeEndLineCap="Round"
+                                              StrokeLineJoin="Round"
+                                              Fill="Transparent"/>
+                                    </Viewbox>
+                                    <TextBlock Text="Die Warteschlange ist leer" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Füge Links hinzu oder importiere eine Liste,&#x0a;um mit dem Download zu beginnen."
+                                               Foreground="{StaticResource PowerMuted}"
+                                               TextAlignment="Center"
+                                               LineHeight="20"
+                                               FontSize="12.5"
+                                               Margin="0,8,0,18"/>
+                                    <Button Click="FocusUrl_Click"
+                                            Style="{StaticResource PowerLinkButton}"
+                                            Padding="15,8"
+                                            AutomationProperties.Name="Link im manuellen Eingabefeld hinzufügen">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" Foreground="#6F9AFF" Margin="0,0,7,0"/>
+                                            <TextBlock Text="Link hinzufügen" Foreground="#6F9AFF"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasJobs}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <ListBox ItemsSource="{Binding Jobs}"
+                                         Margin="0,10,0,0"
+                                         VirtualizingPanel.IsVirtualizing="True"
+                                         VirtualizingPanel.VirtualizationMode="Recycling"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#202833"
+                                                    BorderBrush="#2F3947"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Padding="10"
+                                                    Margin="0,0,0,7">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="34"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="96"/>
+                                                        <ColumnDefinition Width="84"/>
+                                                        <ColumnDefinition Width="36"/>
+                                                        <ColumnDefinition Width="36"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Number, StringFormat='#{0}'}" Foreground="#7FA3FA" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                                    <Grid Grid.Column="1" Margin="7,0,12,0">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Grid.Row="1" Text="{Binding Detail}" Foreground="{StaticResource PowerMuted}" TextTrimming="CharacterEllipsis" FontSize="10.5" Margin="0,2,0,6"/>
+                                                        <ProgressBar Grid.Row="2" Value="{Binding Progress}" Maximum="1" Height="4" Foreground="{StaticResource PowerPrimary}" Background="#303A47"/>
+                                                    </Grid>
+                                                    <Border Grid.Column="2" Width="88" Height="50" Background="#12171E" CornerRadius="6" ClipToBounds="True">
+                                                        <Grid>
+                                                            <TextBlock Text="Kein Bild" Foreground="#606A78" HorizontalAlignment="Center" FontSize="9"/>
+                                                            <Image Source="{Binding ThumbnailUrl}" Stretch="UniformToFill"/>
+                                                        </Grid>
+                                                    </Border>
+                                                    <TextBlock Grid.Column="3" Text="{Binding StatusText}" Foreground="{Binding StatusColor}" HorizontalAlignment="Center" FontSize="10.5" FontWeight="SemiBold"/>
+                                                    <Button Grid.Column="4"
+                                                            Content="&#xE71A;"
+                                                            FontFamily="Segoe MDL2 Assets"
+                                                            Command="{Binding DataContext.SkipJobCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            IsEnabled="{Binding CanSkip}"
+                                                            Style="{StaticResource PowerButton}"
+                                                            Width="30"
+                                                            Height="30"
+                                                            MinHeight="30"
+                                                            Padding="2"
+                                                            ToolTip="Aktuellen Job überspringen"
+                                                            AutomationProperties.Name="Aktuellen Download überspringen"/>
+                                                    <Button Grid.Column="5"
+                                                            Content="&#xE74D;"
+                                                            FontFamily="Segoe MDL2 Assets"
+                                                            Foreground="{StaticResource PowerDanger}"
+                                                            Command="{Binding DataContext.RemoveJobCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource PowerButton}"
+                                                            Width="30"
+                                                            Height="30"
+                                                            MinHeight="30"
+                                                            Padding="2"
+                                                            ToolTip="Job entfernen"
+                                                            AutomationProperties.Name="Download aus Warteschlange entfernen"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2" Style="{StaticResource PowerCardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="49"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Margin="18,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Ausgabe / Log" FontWeight="SemiBold" FontSize="13.5"/>
+                        <Button Grid.Column="1"
+                                Command="{Binding ClearLogCommand}"
+                                Style="{StaticResource PowerButton}"
+                                Padding="10,5"
+                                MinHeight="31"
+                                AutomationProperties.Name="Protokoll leeren">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Foreground="{StaticResource PowerMuted}" Margin="0,0,7,0"/>
+                                <TextBlock Text="Log leeren"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <Border Grid.Row="1"
+                            Margin="16,0,16,16"
+                            Background="{StaticResource PowerTerminal}"
+                            BorderBrush="#333D49"
+                            BorderThickness="1"
+                            CornerRadius="7"
+                            ClipToBounds="True">
+                        <RichTextBox x:Name="LogBox"
+                                     IsReadOnly="True"
+                                     IsDocumentEnabled="True"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Foreground="#C5CCD6"
+                                     FontFamily="Consolas"
+                                     FontSize="10.5"
+                                     Padding="13,10"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Disabled"
+                                     AutomationProperties.Name="yt-dlp Ausgabeprotokoll">
+                            <FlowDocument PagePadding="0" LineHeight="17"/>
+                        </RichTextBox>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,136 @@
+<Window x:Class="MediaForge.Views.MarkerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Marker — MediaForge"
+        Width="520" SizeToContent="Height" MinWidth="460"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Loaded="OnLoaded"
+        Background="{StaticResource BackgroundBrush}">
+    <Window.Resources>
+        <Style x:Key="DialogLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PowerMuted}"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,12,0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="22,18,22,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+            <Border Width="3" Height="20" CornerRadius="2" Background="{StaticResource ModuleEditor}" Margin="0,0,11,0"/>
+            <TextBlock Text="{Binding HeaderText}" FontSize="17" FontWeight="Bold"/>
+            <TextBlock Text="{Binding DurationHint}" Style="{StaticResource DialogLabel}" Margin="12,2,0,0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton Content="Punkt" IsChecked="{Binding IsPoint}" GroupName="MarkerKind" AutomationProperties.Name="Punkt-Marker"/>
+                <RadioButton Content="Bereich" IsChecked="{Binding IsRange}" GroupName="MarkerKind" Margin="18,0,0,0" AutomationProperties.Name="Bereich-Marker"/>
+            </StackPanel>
+            <TextBlock Text="{Binding TypeHint}" Style="{StaticResource DialogLabel}" Margin="0,7,0,14" TextWrapping="Wrap"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="86"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Zeitpunkt" Style="{StaticResource DialogLabel}"/>
+                <TextBox Grid.Column="1" x:Name="StartBox" Text="{Binding StartText, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource PowerCodeInput}" AutomationProperties.Name="Zeitpunkt des Markers"/>
+                <TextBlock Grid.Column="2" Text="bis" Style="{StaticResource DialogLabel}" Margin="14,0,12,0"
+                           Visibility="{Binding IsRange, Converter={StaticResource BoolToVisibility}}"/>
+                <TextBox Grid.Column="3" Text="{Binding EndText, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource PowerCodeInput}"
+                         Visibility="{Binding IsRange, Converter={StaticResource BoolToVisibility}}"
+                         AutomationProperties.Name="Endzeit des Bereichs"/>
+            </Grid>
+
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="86"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Titel" Style="{StaticResource DialogLabel}"/>
+                <TextBox Grid.Column="1" x:Name="TitleBox" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                         AutomationProperties.Name="Titel des Markers"/>
+            </Grid>
+
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="86"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Notiz" Style="{StaticResource DialogLabel}" VerticalAlignment="Top" Margin="0,10,12,0"/>
+                <TextBox Grid.Column="1" Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}"
+                         Height="74" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top"
+                         VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Notiz zum Marker"/>
+            </Grid>
+
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="86"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Tags" Style="{StaticResource DialogLabel}"/>
+                <TextBox Grid.Column="1" Text="{Binding TagsText, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="Mehrere Tags mit Leerzeichen oder Komma trennen"
+                         AutomationProperties.Name="Tags des Markers"/>
+            </Grid>
+            <TextBlock Text="z. B.  #tor #müller #highlight" Style="{StaticResource DialogLabel}" Margin="86,5,0,0"/>
+
+            <Grid Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="86"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Kategorie" Style="{StaticResource DialogLabel}"/>
+                <ComboBox Grid.Column="1" IsEditable="True" ItemsSource="{Binding Categories}"
+                          Text="{Binding Category, UpdateSourceTrigger=PropertyChanged}"
+                          AutomationProperties.Name="Kategorie des Markers"/>
+            </Grid>
+
+            <Border Background="#3A2530" BorderBrush="#5E3742" BorderThickness="1" CornerRadius="7" Padding="12,8" Margin="0,12,0,0"
+                    Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Text="{Binding Error}" Foreground="{StaticResource PowerDanger}" FontSize="11.5" TextWrapping="Wrap"/>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Row="2" Margin="0,18,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Click="Delete_Click" Style="{StaticResource PowerDangerButton}" MinWidth="120"
+                    Visibility="{Binding CanDelete, Converter={StaticResource BoolToVisibility}}"
+                    AutomationProperties.Name="Marker löschen">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                    <TextBlock Text="Löschen"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Click="Cancel_Click" IsCancel="True" MinWidth="120" AutomationProperties.Name="Abbrechen">
+                <TextBlock Text="Abbrechen"/>
+            </Button>
+            <Button Grid.Column="3" Click="Save_Click" IsDefault="True" Style="{StaticResource PowerPrimaryButton}"
+                    MinWidth="140" Margin="10,0,0,0" AutomationProperties.Name="Marker speichern">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE74E;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0"/>
+                    <TextBlock Text="Speichern"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>
