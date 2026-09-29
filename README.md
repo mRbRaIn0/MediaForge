@@ -1,71 +1,77 @@
 # MediaForge
 
-Windows-Desktop-App zum **Herunterladen, Schneiden, Bearbeiten, Konvertieren und Sortieren** von Videos,
-Audio und Fotos. Eine Oberfläche für `yt-dlp` und `FFmpeg` – ohne Kommandozeile.
+Windows desktop app for **downloading, trimming, editing, converting, and sorting** videos,
+audio, and photos. A user interface for `yt-dlp` and `FFmpeg` — no command line needed.
 
-![Plattform](https://img.shields.io/badge/Windows-10%20%7C%2011-blue) ![.NET](https://img.shields.io/badge/.NET-10-purple) ![Lizenz](https://img.shields.io/badge/Lizenz-MIT-green)
+![Platform](https://img.shields.io/badge/Windows-10%20%7C%2011-blue) ![.NET](https://img.shields.io/badge/.NET-10-purple) ![License](https://img.shields.io/badge/License-MIT-green)
 
-## Funktionen
+[Deutsch](README.de.md)
 
-| Bereich | Was er kann |
+## Features
+
+| Area | What it does |
 | --- | --- |
-| **Galerie** | Ordner einlesen, Zeitleiste, Suche, Alben, Tags, Favoriten |
-| **yt-dlp (Download)** | Videos & Audio herunterladen, Warteschlange, Zeitbereiche, MP3, Qualität/Format, Cookies, URL-Liste importieren |
-| **Cut** | Videos verlustfrei schneiden |
-| **Editor** | Marker setzen, Bereiche benennen/taggen, Clips zusammenstellen und exportieren |
-| **Convert** | Formate umwandeln und defekte Videos reparieren |
-| **Speed Zone** | Abschnitte schneller oder langsamer abspielen lassen |
-| **Link** | Mehrere Videos zu einem zusammenfügen |
-| **Sorter** | Dateien per Tastendruck in Zielordner einsortieren (mit Vorschau, Rückgängig, Backup) |
+| **Gallery** | Browse folders, timeline, search, albums, tags, and favorites |
+| **yt-dlp (Download)** | Download video and audio; queue jobs; select time ranges, MP3, quality, and format; use cookies; import URL lists |
+| **Cut** | Trim videos without re-encoding |
+| **Editor** | Add markers, name and tag segments, assemble clips, and export |
+| **Convert** | Convert formats and repair broken videos |
+| **Speed Zone** | Speed up or slow down sections |
+| **Link** | Join multiple videos into one |
+| **Sorter** | Sort files into destination folders with keyboard shortcuts, preview, undo, and backup |
 
 ## Installation
 
-### 1. MediaForge herunterladen
-Unter [Releases](https://github.com/mRbRaIn0/MediaForge/releases) die aktuelle **`MediaForge.exe`**
-herunterladen und in einen beliebigen Ordner legen (z. B. `C:\Tools\MediaForge\`).
-Es ist **keine Installation und kein .NET** nötig – einfach starten.
+### 1. Download MediaForge
 
-> Windows SmartScreen kann beim ersten Start warnen, weil die Exe nicht signiert ist:
-> **Weitere Informationen → Trotzdem ausführen**.
+Download the latest **`MediaForge.exe`** from [Releases](https://github.com/mRbRaIn0/MediaForge/releases)
+and put it in any folder (for example, `C:\Tools\MediaForge\`). No installer or separate .NET
+installation is required — just run it.
 
-### 2. yt-dlp und FFmpeg besorgen (erforderlich)
-MediaForge nutzt zwei freie Werkzeuge, die **nicht** mitgeliefert werden:
+> Windows SmartScreen may warn you on first launch because the executable is unsigned:
+> select **More info → Run anyway**.
 
-- **yt-dlp** – für Downloads: <https://github.com/yt-dlp/yt-dlp/releases> (`yt-dlp.exe`)
-- **FFmpeg** – für Schneiden, Konvertieren, Vorschau: <https://www.gyan.dev/ffmpeg/builds/> oder
-  <https://github.com/BtbN/FFmpeg-Builds/releases> (benötigt: `ffmpeg.exe`, `ffprobe.exe`, `ffplay.exe`)
+### 2. Get yt-dlp and FFmpeg (required)
 
-**Am einfachsten:** In MediaForge den Bereich **yt-dlp** öffnen und auf **yt-dlp Update** bzw.
-**FFmpeg Update** klicken – beide Werkzeuge werden dann automatisch heruntergeladen.
+MediaForge uses two free tools that are **not included**:
 
-**Alternativ manuell:** Die Exe-Dateien neben `MediaForge.exe` legen oder in den **Einstellungen**
-den Pfad angeben. MediaForge sucht in dieser Reihenfolge:
+- **yt-dlp** for downloads: <https://github.com/yt-dlp/yt-dlp/releases> (`yt-dlp.exe`)
+- **FFmpeg** for trimming, conversion, and previews: <https://www.gyan.dev/ffmpeg/builds/> or
+  <https://github.com/BtbN/FFmpeg-Builds/releases> (requires `ffmpeg.exe`, `ffprobe.exe`, and `ffplay.exe`)
 
-1. in den Einstellungen hinterlegter Pfad
-2. Ordner der `MediaForge.exe` und Arbeitsordner
-3. Unterordner `Weiteres` bzw. `ffmpeg\bin`
+**Easiest option:** Open the **yt-dlp** section in MediaForge and click **yt-dlp Update** and
+**FFmpeg Update**. Both tools will be downloaded automatically.
+
+**Manual option:** Put the executables next to `MediaForge.exe` or set their paths in **Einstellungen**
+(Settings). MediaForge searches in this order:
+
+1. Path configured in Settings
+2. Folder containing `MediaForge.exe` and the working directory
+3. `Weiteres` or `ffmpeg\bin` subfolder
 4. `%LocalAppData%\MediaForge\tools`
-5. Windows-`PATH`
+5. Windows `PATH`
 
-### 3. Einstellungen (optional)
-Über **Einstellungen** im Hauptmenü:
+### 3. Configure settings (optional)
 
-- **Zielordner** – Standard ist `Videos\MediaForge` im Benutzerprofil (wird automatisch angelegt),
-  zusätzlich ein eigener Zielordner
-- **Werkzeugpfade** für `yt-dlp.exe` und `ffmpeg.exe`
-- **URLs-Datei** für den Massen-Import
-- **Cookies** – aus (Standard), aus einem Browser (Firefox, Chrome, Edge, Brave, optional mit Profil)
-  oder aus einer `cookies.txt`. Nötig für Inhalte, die eine Anmeldung erfordern.
-- **Sorter** – Startordner, Zielbereiche und Tasten
+Open **Einstellungen** (Settings) from the main menu:
 
-## Bedienung
+- **Download folders:** By default, `Videos\MediaForge` in your user profile (created automatically),
+  with an option to use a custom folder
+- **Tool paths** for `yt-dlp.exe` and `ffmpeg.exe`
+- **URL file** for bulk imports
+- **Cookies:** Off by default; load them from a browser (Firefox, Chrome, Edge, or Brave, optionally
+  with a profile) or a `cookies.txt` file for content that requires a login
+- **Sorter:** Source folder, destinations, and keyboard shortcuts
+
+## Usage
 
 ### Download
-1. URL einfügen, Modus (Video/MP3), Qualität und Format wählen, optional einen Zeitbereich.
-2. Zur Warteschlange hinzufügen und starten. Fortschritt und Log erscheinen unten.
 
-**URL-Liste importieren:** Beim ersten Klick auf *Import* wird eine Vorlage `urls.txt` angelegt.
-Eine URL pro Zeile, `#` leitet einen Kommentar ein, optional dahinter Zeitbereich und/oder `mp3`:
+1. Paste a URL and choose the mode (video/MP3), quality, format, and optionally a time range.
+2. Add the job to the queue and start it. Progress and logs appear below.
+
+**Import a URL list:** The first click on *Import* creates a `urls.txt` template. Use one URL per line;
+`#` starts a comment. You can optionally add a time range and/or `mp3`:
 
 ```text
 https://www.youtube.com/watch?v=XXXXXXXXXXX
@@ -73,59 +79,60 @@ https://www.youtube.com/watch?v=YYYYYYYYYYY 00:00:10-00:02:30 mp3
 ```
 
 ### Cut, Editor, Convert, Speed Zone, Link
-Datei öffnen, im Player bzw. auf der Zeitleiste Bereiche wählen und exportieren. Der Editor speichert
-Marker und Bereiche als `<video>.mediaforge.json` neben dem Video, damit sie beim nächsten Öffnen
-wieder da sind.
+
+Open a file, select ranges in the player or timeline, and export. The Editor saves markers and
+segments next to the video in `<video>.mediaforge.json` so they are available next time.
 
 ### Sorter
-Startordner und Zielbereiche festlegen, dann Datei für Datei einsortieren:
 
-| Taste | Aktion |
+Choose a source folder and destinations, then sort files one at a time:
+
+| Key | Action |
 | --- | --- |
-| `1`–`9`, `0`, `Q`–`P` | in den jeweiligen Zielbereich legen (eigene Tasten in den Einstellungen möglich) |
-| `Leertaste` | Video abspielen/pausieren |
-| `←` / `→` | vorherige/nächste Datei |
-| `S` | überspringen |
-| `Strg+Z` | letzte Ablage rückgängig |
-| `F5` | Ordner neu einlesen |
+| `1`–`9`, `0`, `Q`–`P` | Move to the corresponding destination (custom shortcuts can be set in Settings) |
+| `Space` | Play/pause video |
+| `←` / `→` | Previous/next file |
+| `S` | Skip |
+| `Ctrl+Z` | Undo the last sort action |
+| `F5` | Rescan the folder |
 
-Standardmäßig wird verschoben (optional kopiert); vorhandene Dateien werden nie überschrieben.
+Files are moved by default (copying is optional); existing files are never overwritten.
 
-## Wo liegen die Daten?
+## Where is data stored?
 
-| Was | Ort |
+| Data | Location |
 | --- | --- |
-| Einstellungen | `%AppData%\MediaForge\settings.json` |
-| Sorter-Fortschritt | `%AppData%\MediaForge\sorter\` |
-| Heruntergeladene Werkzeuge | neben der Exe, sonst `%LocalAppData%\MediaForge\tools` |
-| Downloads | `Videos\MediaForge` (einstellbar) |
+| Settings | `%AppData%\MediaForge\settings.json` |
+| Sorter progress | `%AppData%\MediaForge\sorter\` |
+| Downloaded tools | Next to the executable, or `%LocalAppData%\MediaForge\tools` |
+| Downloads | `Videos\MediaForge` (configurable) |
 
-Zum Deinstallieren die Exe und die genannten Ordner löschen.
+To uninstall, delete the executable and the folders listed above.
 
-## Selbst bauen
+## Build from source
 
-Voraussetzung: [.NET 10 SDK](https://dotnet.microsoft.com/download).
+Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download).
 
 ```powershell
-# Entwickeln / starten
+# Develop / run
 dotnet run --project .\MediaForge\MediaForge.csproj -c Release -p:Platform=x64
 
-# Portable Einzel-Exe nach .\release\MediaForge.exe
+# Portable single-file executable at .\release\MediaForge.exe
 dotnet publish .\MediaForge\MediaForge.csproj -p:PublishProfile=Portable
 
-# UI-Smoke-Tests
+# UI smoke tests
 dotnet run --project .\MediaForge.SmokeTests\MediaForge.SmokeTests.csproj -c Release
 ```
 
-Technik: C# / .NET 10, WPF, MVVM, keine NuGet-Abhängigkeiten. Details zur Architektur in
-[`MediaForge/README.md`](MediaForge/README.md).
+Built with C# / .NET 10, WPF, and MVVM, with no NuGet dependencies. See
+[`MediaForge/README.md`](MediaForge/README.md) for architecture details (in German).
 
-## Rechtlicher Hinweis
+## Legal notice
 
-MediaForge ist nur eine Oberfläche. Lade nur Inhalte herunter, zu deren Nutzung du berechtigt bist,
-und beachte die Nutzungsbedingungen der jeweiligen Plattform. yt-dlp und FFmpeg stehen unter ihren
-eigenen Lizenzen (Unlicense bzw. LGPL/GPL).
+MediaForge is a user interface. Only download content you are authorized to use, and follow the
+terms of service of the relevant platform. yt-dlp and FFmpeg have their own licenses (Unlicense
+and LGPL/GPL, respectively).
 
-## Lizenz
+## License
 
 [MIT](LICENSE) © 2026 mRbRaIn0
